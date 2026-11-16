@@ -64,14 +64,15 @@
    cIndex.textContent=String(number).padStart(2,'0')+' / '+String(routes.length).padStart(2,'0');cTitle.textContent=label;
    const tl=gsap.timeline({defaults:{ease:'expo.inOut'},onComplete(){gsap.set(curtain,{visibility:'hidden'});}});
    tl.set(curtain,{visibility:'visible'})
-    .to(back,{clipPath:'inset(0% 0% 0% 0%)',duration:.5})
-    .to(front,{clipPath:'inset(0% 0% 0% 0%)',duration:.5},.08)
-    .fromTo([cIndex,cTitle],{yPercent:120},{yPercent:0,duration:.55,ease:'expo.out',stagger:.05},.3)
-    .fromTo(cLine,{scaleX:0},{scaleX:1,duration:.5,ease:'power3.inOut'},.3)
-    .call(onCovered,null,.6)
-    .to([cIndex,cTitle],{yPercent:-120,duration:.4,ease:'expo.in',stagger:.03},.72)
-    .to(front,{clipPath:'inset(0% 0% 100% 0%)',duration:.55},.95)
-    .to(back,{clipPath:'inset(0% 0% 100% 0%)',duration:.55},1.02)
+    // Environ 2,1 s au total : le rideau couvre, le titre reste lisible, puis le rideau se lève.
+    .to(back,{clipPath:'inset(0% 0% 0% 0%)',duration:.65})
+    .to(front,{clipPath:'inset(0% 0% 0% 0%)',duration:.65},.1)
+    .fromTo([cIndex,cTitle],{yPercent:120},{yPercent:0,duration:.7,ease:'expo.out',stagger:.06},.4)
+    .fromTo(cLine,{scaleX:0},{scaleX:1,duration:.65,ease:'power3.inOut'},.4)
+    .call(onCovered,null,.8)
+    .to([cIndex,cTitle],{yPercent:-120,duration:.5,ease:'expo.in',stagger:.04},1.05)
+    .to(front,{clipPath:'inset(0% 0% 100% 0%)',duration:.7},1.3)
+    .to(back,{clipPath:'inset(0% 0% 100% 0%)',duration:.7},1.39)
     .set([back,front],{clipPath:'inset(100% 0% 0% 0%)'});
    return tl;
   }
@@ -119,7 +120,7 @@
   const id=e.detail.id;progress.style.transform=`scaleX(${(routes.indexOf(id)+1)/routes.length})`;
   requestAnimationFrame(movePill);
   if(boot&&!boot.hidden)return; // l'introduction est encore affichée
-  entrance(id,firstShown?.32:0);firstShown=true;
+  entrance(id,firstShown?.46:0);firstShown=true;
  });
  window.addEventListener('portfolio:ready',()=>{firstShown=true;const id=location.hash.slice(1)||'accueil';entrance(routes.includes(id)?id:'accueil',.05);});
 

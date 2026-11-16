@@ -22,6 +22,9 @@ L’entrée est passable. Dix rubriques indépendantes restent accessibles par m
 ## Introduction
 Séquence de déchiffrement (`experience.js`, styles dans `intro.css`) : une clé se verrouille octet par octet, puis le nom, la formation, l’alternance et les domaines passent du texte chiffré au texte en clair pendant qu’un fond de caractères s’efface ; le cadenas s’ouvre et le portfolio apparaît. Environ 6 s, passable avec le bouton ou `Échap`, rejouable depuis le pied de page. Elle est purement décorative : aucun chiffrement réel n’est effectué. Elle se joue quel que soit le réglage d’animations du système ; seul le réglage du portfolio la raccourcit.
 
+## Contact
+La rubrique Contact affiche un QR code qui contient une fiche contact (vCard : nom, fonction, e-mail, profil LinkedIn). Un clic l’agrandit pour le scanner de loin. La même fiche se télécharge avec `assets/fares-aref.vcf`. Si une coordonnée change, il faut régénérer le QR code et ce fichier.
+
 ## Réglages
 Le bouton **Réglages** (en haut à droite) regroupe trois options :
 - **Thème sombre** : bascule clair/sombre, mémorisée sur le navigateur. Le globe, la carte du voyage et l’introduction suivent le thème.

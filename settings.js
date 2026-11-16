@@ -58,7 +58,7 @@
  const two=n=>String(n).padStart(2,'0');
  function renderBar(){stepEl.textContent=two(index+1)+' / '+two(steps.length);labelEl.textContent=steps[index].label;}
  function renderTimer(){const s=Math.floor((Date.now()-startedAt)/1000);timerEl.textContent=two(Math.floor(s/60))+':'+two(s%60);}
- function closeDialogs(){if(projectDialog?.open)projectDialog.close();if(synthesisDialog?.open)synthesisDialog.close();}
+ function closeDialogs(){document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());}
  function go(target){
   index=Math.max(0,Math.min(steps.length-1,target));const step=steps[index];
   closeDialogs();
@@ -85,7 +85,7 @@
  // Quitter le plein écran quitte le mode oral, sauf si Échap vient de fermer une fiche.
  document.addEventListener('fullscreenchange',()=>{
   if(!oral||document.fullscreenElement)return;
-  if(projectDialog?.open||synthesisDialog?.open){closeDialogs();return;}
+  if(document.querySelector('dialog[open]')){closeDialogs();return;}
   exitOral();
  });
  // Garder le repère à jour quand on navigue à la souris pendant l'oral.
@@ -97,7 +97,7 @@
   if(!oral||e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey)return;
   const shell=$('experience-shell');if(shell?.inert)return; // introduction en cours
   if(e.target.closest?.('input,textarea,select,[contenteditable]'))return;
-  const dialogOpen=projectDialog?.open||synthesisDialog?.open;
+  const dialogOpen=!!document.querySelector('dialog[open]');
   let handled=true;
   switch(e.key){
    case 'ArrowRight':case 'PageDown':go(index+1);break;
