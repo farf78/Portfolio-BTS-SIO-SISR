@@ -1,0 +1,4 @@
+# Fichiers de travail, inutiles au site
+.work/
+.claude/
+*.inspect.ndjson

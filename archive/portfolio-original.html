@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AREF Farès — Portfolio E5 SISR</title>
+    <script>
+        // Diagnostic : affiche toute erreur JavaScript directement à l'écran
+        window.addEventListener('error', e => {
+            const d = document.createElement('div');
+            d.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:2147483647;background:#DC2626;color:#fff;font:700 14px monospace;padding:10px;white-space:pre-wrap';
+            d.textContent = 'ERREUR : ' + e.message + ' (ligne ' + e.lineno + ')';
+            document.addEventListener('DOMContentLoaded', () => document.body.appendChild(d));
+            if (document.body) document.body.appendChild(d);
+        });
+    </script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+
+    <!-- WebGL 3D Background Canvas -->
+    <div id="webgl-container"></div>
+
+    <!-- Sélection du héros -->
+    <div id="select-bg"></div>
+    <div id="select-screen">
+        <h1 class="select-title">CHOISIS TON HÉROS</h1>
+        <p class="select-sub">Seul un profil est jouable pour l'instant. Les autres arrivent bientôt.</p>
+        <div class="roster" id="roster"></div>
+        <p class="select-hint">▶ Clique sur ton profil</p>
+    </div>
+    <div id="select-toast" role="status"></div>
+    <div id="flash"></div>
+    <div id="shockwave"></div>
+
+    <!-- Intro Opening Animation -->
+    <div id="intro-screen">
+        <div class="action-lines" id="action-lines"></div>
+        <div class="intro-text-1">BTS...</div>
+        <div class="intro-text-2">SIO  !!</div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="flex flex-col md:flex-row md:items-center justify-between px-6 py-4">
+            <div class="nav-logo" onclick="navigate('accueil')">
+                AREF FARÈS <span style="color:var(--comic-white); font-size:1.6rem; -webkit-text-stroke: 1px black;">// PORTFOLIO E5</span>
+            </div>
+            <div class="font-code text-xs uppercase font-bold mt-2 md:mt-0 bg-white text-black px-3 py-1 border-2 border-black shadow-[3px_3px_0_var(--mha-green)] transform skew-x-[-3deg]">
+                STATUS: EN LIGNE // BTS SIO SISR
+            </div>
+        </div>
+        <nav class="nav-tabs">
+            <button class="nav-btn active" data-page="accueil" onclick="navigate('accueil')">Accueil</button>
+            <button class="nav-btn" data-page="profil" onclick="navigate('profil')">Profil</button>
+            <button class="nav-btn" data-page="entreprise" onclick="navigate('entreprise')">Entreprise</button>
+            <button class="nav-btn" data-page="missions" onclick="navigate('missions')">Missions</button>
+            <button class="nav-btn" data-page="realisations" onclick="navigate('realisations')">Réalisations</button>
+            <button class="nav-btn" data-page="competences" onclick="navigate('competences')">Compétences</button>
+            <button class="nav-btn" data-page="veille" onclick="navigate('veille')">Veille Tech</button>
+            <button class="nav-btn" data-page="bilan" onclick="navigate('bilan')">Bilan</button>
+            <button class="nav-btn" data-page="contact" onclick="navigate('contact')">Contact</button>
+            <button class="nav-btn" onclick="showSelect()">⟲ Héros</button>
+            <!-- Nouveaux boutons MHA -->
+            <button class="nav-btn" id="btn-ofa" onclick="toggleOFA()" style="background: var(--mha-green); color: black;" title="Activer le 100% One For All">⚡Changer le Thème</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- PAGE ACCUEIL -->
+        <section id="page-accueil" class="page active">
+            <div class="comic-panel comic-hover border-[5px] border-black p-8 md:p-12">
+                <div class="max-w-3xl mx-auto text-center">
+                    <p class="font-code font-bold text-black mb-4 uppercase tracking-wider bg-mha-green text-black px-4 py-1.5 inline-block border-2 border-black transform -skew-x-3">
+                        Apprenti Administrateur Systèmes et Réseaux
+                    </p>
+                    <h1 style="font-family: var(--font-head); font-size: clamp(3.8rem, 8vw, 7rem); line-height: 0.9; color: var(--comic-text); text-shadow: 5px 5px 0px var(--mha-yellow);" class="mb-6">
+                        AREF <span style="color: var(--mha-blue); -webkit-text-stroke: 2px #000000;">FARÈS</span>
+                    </h1>
+                    <p class="pro-text text-lg md:text-xl mb-10 max-w-2xl mx-auto bg-slate-50 p-6 border-l-8 border-mha-green border-t border-r border-b border-black">
+                        Bienvenue sur mon <strong>e-portfolio de BTS SIO SISR</strong>. N'hésitez pas à parcourir les différentes rubriques ci-dessus pour découvrir mes missions en alternance et mes projets techniques.
+                    </p>
+                    <div class="flex gap-4 justify-center flex-wrap">
+                        <button class="comic-btn" onclick="navigate('realisations')">VOIR LES RÉALISATIONS (E5)</button>
+                        <button class="comic-btn" style="background:var(--mha-blue);" onclick="navigate('contact')">ME CONTACTER</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE PROFIL -->
+        <section id="page-profil" class="page">
+            <div class="section-header-box border-black" style="background: linear-gradient(135deg, #EFF6FF 0%, #FEF3C7 100%);">
+                <div>
+                    <h2 class="panel-header-title">Profil & Parcours</h2>
+                    <span class="panel-badge" style="background:var(--mha-blue); color:white;">Identité professionnelle & Scolarité</span>
+                </div>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Info Card -->
+                <div class="comic-panel comic-hover border-t-8 border-t-mha-blue">
+                    <div class="flex justify-between items-center border-b-4 border-black pb-3 mb-6 bg-blue-50 p-3 border-2 border-black">
+                        <span class="font-head text-2xl text-black">INFORMATIONS PERSONNELLES</span>
+                        <span class="font-code text-xs bg-mha-yellow font-bold px-2.5 py-1 border-2 border-black shadow-[2px_2px_0_#000]">H3 CAMPUS</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-blue-50/60 border-3 border-black p-4 shadow-[3px_3px_0_rgba(37,99,235,0.15)]">
+                            <span class="text-xs font-bold uppercase text-blue-700">Nom & Âge</span>
+                            <div class="pro-title text-xl text-black mt-1">AREF Farès — 18 ans</div>
+                        </div>
+                        <div class="bg-emerald-50/60 border-3 border-black p-4 shadow-[3px_3px_0_rgba(16,185,129,0.15)]">
+                            <span class="text-xs font-bold uppercase text-emerald-700">Formation actuelle</span>
+                            <div class="pro-title text-xl text-black mt-1">BTS SIO option SISR</div>
+                        </div>
+                        <div class="bg-amber-50/60 border-3 border-black p-4 shadow-[3px_3px_0_rgba(250,204,21,0.2)]">
+                            <span class="text-xs font-bold uppercase text-amber-700">Établissement</span>
+                            <div class="pro-title text-xl text-black mt-1">H3 Campus - Poissy</div>
+                        </div>
+                        <div class="bg-purple-50/60 border-3 border-black p-4 shadow-[3px_3px_0_rgba(139,92,246,0.15)]">
+                            <span class="text-xs font-bold uppercase text-purple-700">Poste en alternance</span>
+                            <div class="pro-title text-xl text-black mt-1">Apprenti Administrateur Systèmes et Réseaux</div>
+                        </div>
+                        <div class="bg-red-50/60 border-3 border-black p-4 shadow-[3px_3px_0_rgba(220,38,38,0.15)]">
+                            <span class="text-xs font-bold uppercase text-red-700">Entreprise d'accueil</span>
+                            <div class="pro-title text-xl text-black mt-1">Mairie de Mantes-la-Ville — DSI</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="comic-panel comic-hover border-t-8 border-t-mha-yellow">
+                    <h3 class="pro-title text-2xl mb-6 border-b-4 border-black pb-2 text-black bg-amber-50 p-2 border-2 border-black">Parcours Scolaire</h3>
+                    <div class="timeline">
+                        <div class="tl-item">
+                            <div class="inline-block bg-mha-blue text-black font-code font-bold px-3 py-1 mb-2 border-2 border-black transform -skew-x-2 shadow-[2px_2px_0_#000]">2022 – 2025</div>
+                            <div class="pro-title text-lg text-black">Lycée Vincent Van Gogh, Aubergenville</div>
+                            <div class="pro-text text-sm mt-1 bg-slate-50 p-3 border-2 border-black">Enseignement général — Préparation au Baccalauréat</div>
+                        </div>
+                        <div class="tl-item">
+                            <div class="inline-block bg-mha-green text-black font-code font-bold px-3 py-1 mb-2 border-2 border-black transform -skew-x-2 shadow-[2px_2px_0_#000]">2025</div>
+                            <div class="pro-title text-lg text-black">Baccalauréat Général</div>
+                            <div class="pro-text text-sm mt-1 bg-slate-50 p-3 border-2 border-black">Spécialités : NSI, SES — Option : Chinois LV3</div>
+                        </div>
+                        <div class="tl-item" style="margin-bottom:0;">
+                            <div class="inline-block bg-mha-red text-black font-code font-bold px-3 py-1 mb-2 border-2 border-black transform -skew-x-2 shadow-[2px_2px_0_#000]">2025 – 2027 (En cours)</div>
+                            <div class="pro-title text-lg text-black">BTS SIO option SISR</div>
+                            <div class="pro-text text-sm mt-1 bg-slate-50 p-3 border-2 border-black">Services Informatiques aux Organisations — Solutions d'Infrastructure, Systèmes et Réseaux</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE ENTREPRISE -->
+        <section id="page-entreprise" class="page">
+            <div class="section-header-box border-black" style="background: linear-gradient(135deg, #FEF3C7 100%, #DC2626 5%);">
+                <div>
+                    <h2 class="panel-header-title">Structure d'Accueil</h2>
+                    <span class="panel-badge" style="background:var(--mha-red); color:white;">Mairie de Mantes-la-Ville — DSI</span>
+                </div>
+            </div>
+            
+            <div class="comic-panel comic-hover border-[5px] p-8 border-t-8 border-t-mha-orange">
+                <div class="bg-orange-50 border-3 border-black p-4 mb-6 shadow-[4px_4px_0_#000]">
+                    <h3 class="pro-title text-3xl mb-2 text-black uppercase">Collectivité Territoriale</h3>
+                    <p class="pro-text text-lg">
+                        La Mairie de Mantes-la-Ville assure les services publics pour environ <strong>20 000 habitants</strong>. Elle gère l'administration locale, les services sociaux, l'urbanisme et les équipements municipaux.
+                    </p>
+                </div>
+
+                <div class="bg-blue-50 border-3 border-black p-4 mb-8 shadow-[4px_4px_0_#000]">
+                    <h3 class="pro-title text-3xl mb-2 text-black uppercase">Direction des Services d'Information (DSI)</h3>
+                    <p class="pro-text text-lg">
+                        La DSI gère l'ensemble du parc informatique de la mairie : postes utilisateurs, serveurs, réseau, téléphonie et applications métiers. Elle assure la continuité des services numériques au quotidien.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t-4 border-black">
+                    <div class="bg-amber-100 border-3 border-black p-4 text-center shadow-[4px_4px_0_#000] transform hover:-translate-y-1 transition">
+                        <div class="font-head text-4xl text-black">~300</div>
+                        <div class="font-bold text-xs uppercase mt-1 text-slate-900">Postes Gérés</div>
+                    </div>
+                    <div class="bg-emerald-100 border-3 border-black p-4 text-center shadow-[4px_4px_0_#000] transform hover:-translate-y-1 transition">
+                        <div class="font-head text-4xl text-black">~400</div>
+                        <div class="font-bold text-xs uppercase mt-1 text-slate-900">Agents</div>
+                    </div>
+                    <div class="bg-blue-100 border-3 border-black p-4 text-center shadow-[4px_4px_0_#000] transform hover:-translate-y-1 transition">
+                        <div class="font-head text-4xl text-black">15+</div>
+                        <div class="font-bold text-xs uppercase mt-1 text-slate-900">Sites Connectés</div>
+                    </div>
+                    <div class="bg-purple-100 border-3 border-black p-4 text-center shadow-[4px_4px_0_#000] transform hover:-translate-y-1 transition">
+                        <div class="font-head text-4xl text-black">5j/7</div>
+                        <div class="font-bold text-xs uppercase mt-1 text-slate-900">Services Critiques</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE MISSIONS -->
+        <section id="page-missions" class="page">
+            <div class="section-header-box border-black" style="background: linear-gradient(135deg, #ECFDF5 0%, #EFF6FF 100%);">
+                <div>
+                    <h2 class="panel-header-title">Missions en Alternance</h2>
+                    <span class="panel-badge" style="background:var(--mha-green); color:black;">Activités techniques au sein de la DSI</span>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Mission 1 -->
+                <div class="comic-panel comic-hover border-t-8 border-t-blue-600 bg-blue-50/30 p-6 mission-bubble-container" data-speech="« Sauver les agents d'un plantage de PC, mission accomplie ! »">
+                    <div class="bg-blue-600 text-white font-head text-lg px-2.5 py-1 inline-block border-2 border-black mb-3 transform -skew-x-2">MISSION 01</div>
+                    <h3 class="pro-title text-2xl mb-2" style="color: #2563EB;">Support Utilisateur</h3>
+                    <p class="pro-text text-sm">Assistance téléphonique et sur site, résolution des incidents de niveau 1 et 2 pour les agents de la mairie.</p>
+                </div>
+                <!-- Mission 2 -->
+                <div class="comic-panel comic-hover border-t-8 border-t-emerald-600 bg-emerald-50/30 p-6 mission-bubble-container" data-speech="« Optimisation du parc matériel en cours ! »">
+                    <div class="bg-emerald-600 text-white font-head text-lg px-2.5 py-1 inline-block border-2 border-black mb-3 transform -skew-x-2">MISSION 02</div>
+                    <h3 class="pro-title text-2xl mb-2" style="color: #059669;">Gestion du Parc</h3>
+                    <p class="pro-text text-sm">Installation, configuration et maintenance des postes de travail Windows 10/11.</p>
+                </div>
+                <!-- Mission 3 -->
+                <div class="comic-panel comic-hover border-t-8 border-t-amber-500 bg-amber-50/30 p-6 mission-bubble-container" data-speech="« Active Directory sous contrôle total ! »">
+                    <div class="bg-amber-400 text-black font-head text-lg px-2.5 py-1 inline-block border-2 border-black mb-3 transform -skew-x-2">MISSION 03</div>
+                    <h3 class="pro-title text-2xl mb-2" style="color: #D97706;">Administration Réseau</h3>
+                    <p class="pro-text text-sm">Gestion Active Directory, création de comptes utilisateurs, attribution des droits d'accès.</p>
+                </div>
+                <!-- Mission 4 -->
+                <div class="comic-panel comic-hover border-t-8 border-t-teal-600 bg-teal-50/30 p-6 mission-bubble-container" data-speech="« Connexion fluide établie avec les périphériques ! »">
+                    <div class="bg-teal-600 text-white font-head text-lg px-2.5 py-1 inline-block border-2 border-black mb-3 transform -skew-x-2">MISSION 04</div>
+                    <h3 class="pro-title text-2xl mb-2" style="color: #0D9488;">Périphériques</h3>
+                    <p class="pro-text text-sm">Installation et dépannage d'imprimantes, scanners et équipements de téléphonie IP.</p>
+                </div>
+                <!-- Mission 5 -->
+                <div class="comic-panel comic-hover border-t-8 border-t-red-600 bg-red-50/30 p-6 mission-bubble-container" data-speech="« Pare-feu et sauvegardes : impénétrables ! »">
+                    <div class="bg-red-600 text-white font-head text-lg px-2.5 py-1 inline-block border-2 border-black mb-3 transform -skew-x-2">MISSION 05</div>
+                    <h3 class="pro-title text-2xl mb-2" style="color: #DC2626;">Sécurité</h3>
+                    <p class="pro-text text-sm">Sensibilisation des utilisateurs, mise à jour antivirus, gestion et contrôle des sauvegardes.</p>
+                </div>
+                <!-- Mission 6 -->
+                <div class="comic-panel comic-hover border-t-8 border-t-purple-600 bg-purple-50/30 p-6 mission-bubble-container" data-speech="« Documentation technique classée top-secrète ! »">
+                    <div class="bg-purple-600 text-white font-head text-lg px-2.5 py-1 inline-block border-2 border-black mb-3 transform -skew-x-2">MISSION 06</div>
+                    <h3 class="pro-title text-2xl mb-2" style="color: #7C3AED;">Documentation</h3>
+                    <p class="pro-text text-sm">Rédaction de procédures techniques et suivi rigoureux des tickets d'intervention via GLPI.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE RÉALISATIONS -->
+        <section id="page-realisations" class="page">
+            <div class="section-header-box border-black">
+                <div>
+                    <h2 class="panel-header-title">Réalisations E5</h2>
+                    <span class="panel-badge">Projets et Preuves Techniques SISR</span>
+                </div>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Realisation 1 -->
+                <div class="comic-panel comic-hover flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3 border-b-3 border-black pb-2">
+                            <h3 class="pro-title text-xl text-black">Gestion des incidents via GLPI</h3>
+                            <span class="bg-black text-white font-code text-xs px-2 py-1 font-bold">Support N1/N2</span>
+                        </div>
+                        <p class="pro-text text-sm mb-6">Traitement des tickets d'assistance niveau 1 et 2 pour les agents de la mairie. Diagnostic, résolution et documentation des incidents informatiques.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3 pt-4 border-t-2 border-slate-200">
+                        <button class="comic-btn text-xs py-2 px-3" onclick="openDoc('Exemple ticket.png', 'Exemple d\'incident GLPI')">📄 Exemple d'incident</button>
+                        <button class="comic-btn text-xs py-2 px-3" style="background:var(--mha-yellow); color:black;" onclick="openDoc('Interface GLPI.png', 'Capture interface GLPI')">🖼️ Interface GLPI</button>
+                    </div>
+                </div>
+
+                <!-- Realisation 2 -->
+                <div class="comic-panel comic-hover flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3 border-b-3 border-black pb-2">
+                            <h3 class="pro-title text-xl text-black">Script de transfert de fichiers serveur</h3>
+                            <span class="bg-black text-white font-code text-xs px-2 py-1 font-bold">Automatisation</span>
+                        </div>
+                        <p class="pro-text text-sm mb-6">Utilisation d'un script Bash/PowerShell pour le transfert sécurisé des fichiers utilisateurs (Ancien Serveur → Nouveau serveur).</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3 pt-4 border-t-2 border-slate-200">
+                        <button class="comic-btn text-xs py-2 px-3" style="background:#111; color:#fff; 'Script PowerShell'">👨‍💻 Script PowerShell</button>
+                        <button class="comic-btn text-xs py-2 px-3" style="background:var(--mha-blue);" onclick="openDoc('migration srv files.pdf', 'Pourquoi avoir changé de serveur')">▶️ Contexte Migration</button>
+                    </div>
+                </div>
+
+                <!-- Realisation 3 -->
+                <div class="comic-panel comic-hover flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3 border-b-3 border-black pb-2">
+                            <h3 class="pro-title text-xl text-black">Création & Installation serveur MUNICIPOL</h3>
+                            <span class="bg-black text-white font-code text-xs px-2 py-1 font-bold">Infrastructure</span>
+                        </div>
+                        <p class="pro-text text-sm mb-6">Gestion de projet et installation du logiciel métier utilisé par la Police Municipale de Mantes-la-Ville.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3 pt-4 border-t-2 border-slate-200">
+                        <button class="comic-btn text-xs py-2 px-3" onclick="openDoc('oracle.pdf', 'Prérequis serveur MUNICIPOL')">📄 Prérequis</button>
+                        <button class="comic-btn text-xs py-2 px-3" style="background:var(--mha-orange);" onclick="openDoc('fichesuivi.pdf', 'Fiche de suivi projet')">📊 Fiche de suivi</button>
+                    </div>
+                </div>
+
+                <!-- Realisation 4 -->
+                <div class="comic-panel comic-hover flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-3 border-b-3 border-black pb-2">
+                            <h3 class="pro-title text-xl text-black">Déploiement des postes EPN</h3>
+                            <span class="bg-black text-white font-code text-xs px-2 py-1 font-bold">Déploiement</span>
+                        </div>
+                        <p class="pro-text text-sm mb-6">Mise en place d'un déploiement standardisé pour les PC dédiés aux espaces publics numériques avec intégration au domaine et applications.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3 pt-4 border-t-2 border-slate-200">
+                        <button class="comic-btn text-xs py-2 px-3" style="background:var(--mha-green); color:black;" onclick="openDoc('Procédure préparation PC EPN.pdf', 'Procédure déploiement EPN')">📄 Procédure PDF</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE COMPÉTENCES -->
+        <section id="page-competences" class="page">
+            <div class="section-header-box border-black">
+                <div>
+                    <h2 class="panel-header-title">Compétences SISR</h2>
+                    <span class="panel-badge">Blocs techniques & Opérationnels</span>
+                </div>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Hard Skills -->
+                <div class="comic-panel comic-hover">
+                    <h3 class="pro-title text-xl mb-6 text-black border-b-3 border-black pb-2">Compétences Techniques (Hard Skills)</h3>
+                    
+                    <div class="mb-5">
+                        <div class="flex justify-between font-bold text-xs uppercase mb-1 text-black">
+                            <span>Windows Server / Active Directory / GPO</span>
+                            <span class="font-head text-lg">85%</span>
+                        </div>
+                        <div class="skill-container">
+                            <div class="skill-fill" data-target="85%" style="background-color: var(--mha-blue);"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <div class="flex justify-between font-bold text-xs uppercase mb-1 text-black">
+                            <span>Réseaux (TCP/IP, DHCP, DNS, VLAN)</span>
+                            <span class="font-head text-lg">75%</span>
+                        </div>
+                        <div class="skill-container">
+                            <div class="skill-fill" data-target="75%" style="background-color: var(--mha-green);"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <div class="flex justify-between font-bold text-xs uppercase mb-1 text-black">
+                            <span>Outils & Scripting (PowerShell, Python)</span>
+                            <span class="font-head text-lg">80%</span>
+                        </div>
+                        <div class="skill-container">
+                            <div class="skill-fill" data-target="80%" style="background-color: var(--mha-orange);"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="flex justify-between font-bold text-xs uppercase mb-1 text-black">
+                            <span>Virtualisation & Sécurité (VMware, Antivirus)</span>
+                            <span class="font-head text-lg">70%</span>
+                        </div>
+                        <div class="skill-container">
+                            <div class="skill-fill" data-target="70%" style="background-color: var(--mha-red);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Soft Skills -->
+                <div class="comic-panel comic-hover">
+                    <h3 class="pro-title text-xl mb-6 text-black border-b-3 border-black pb-2">Savoir-faire Opérationnel</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3 bg-slate-50 p-3 border-2 border-black">
+                            <span class="text-lg">🛠️</span>
+                            <div>
+                                <strong class="text-black uppercase text-sm">Support N1 / N2</strong>
+                                <p class="pro-text text-xs mt-0.5">Assistance technique et résolution d'incidents utilisateurs.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 bg-slate-50 p-3 border-2 border-black">
+                            <span class="text-lg">💻</span>
+                            <div>
+                                <strong class="text-black uppercase text-sm">Gestion de parc (~300 postes)</strong>
+                                <p class="pro-text text-xs mt-0.5">Maintenance et suivi du parc informatique municipal.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 bg-slate-50 p-3 border-2 border-black">
+                            <span class="text-lg">📄</span>
+                            <div>
+                                <strong class="text-black uppercase text-sm">Rédaction de procédures</strong>
+                                <p class="pro-text text-xs mt-0.5">Création de documentations techniques claires pour la DSI.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3 bg-slate-50 p-3 border-2 border-black">
+                            <span class="text-lg">🤝</span>
+                            <div>
+                                <strong class="text-black uppercase text-sm">Travail en équipe</strong>
+                                <p class="pro-text text-xs mt-0.5">Collaboration active au sein de l'équipe informatique.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE VEILLE TECHNOLOGIQUE -->
+        <section id="page-veille" class="page">
+            <div class="section-header-box border-black">
+                <div>
+                    <h2 class="panel-header-title">Veille Technologique</h2>
+                    <span class="panel-badge">Cybersécurité & Bonnes Pratiques</span>
+                </div>
+            </div>
+            
+            <div class="comic-panel border-[5px] p-8">
+                <h3 class="pro-title text-2xl mb-4 text-black uppercase">⚠️ Menaces Principales</h3>
+                <div class="grid md:grid-cols-2 gap-4 mb-8">
+                    <div class="bg-slate-50 border-3 border-black p-4">
+                        <strong class="text-black text-base uppercase">Ransomwares</strong>
+                        <p class="pro-text text-sm mt-1">Logiciels malveillants qui chiffrent les données et exigent une rançon, ciblant particulièrement les collectivités territoriales.</p>
+                    </div>
+                    <div class="bg-slate-50 border-3 border-black p-4">
+                        <strong class="text-black text-base uppercase">Phishing</strong>
+                        <p class="pro-text text-sm mt-1">Campagnes de faux e-mails tentant de dérober les identifiants d'accès professionnels des agents.</p>
+                    </div>
+                </div>
+
+                <h3 class="pro-title text-2xl mb-4 text-black uppercase">🛡️ Bonnes Pratiques de Défense</h3>
+                <div class="grid md:grid-cols-2 gap-4 mb-8">
+                    <div class="bg-slate-50 border-3 border-black p-4">
+                        <strong class="text-black text-base uppercase">Authentification forte (MFA)</strong>
+                        <p class="pro-text text-sm mt-1">Double authentification pour sécuriser les accès aux systèmes et réseaux critiques.</p>
+                    </div>
+                    <div class="bg-slate-50 border-3 border-black p-4">
+                        <strong class="text-black text-base uppercase">Sauvegardes isolées</strong>
+                        <p class="pro-text text-sm mt-1">Maintien de copies de données protégées et déconnectées pour parer aux attaques de type ransomware.</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-100 border-3 border-black p-5">
+                    <strong class="text-black text-base uppercase">📚 Sources & Outils de Veille</strong>
+                    <p class="pro-text text-sm mt-1">
+                        Suivi régulier via l'<strong>ANSSI</strong> (CERT-FR), Microsoft Security, IT-Connect, ainsi que des plateformes de labs interactifs (TryHackMe, HackTheBox).
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE BILAN -->
+        <section id="page-bilan" class="page">
+            <div class="section-header-box border-black">
+                <div>
+                    <h2 class="panel-header-title">Bilan d'Expérience</h2>
+                    <span class="panel-badge">Retour d'alternance & Perspectives</span>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="comic-panel comic-hover border-l-8 border-l-mha-green">
+                    <h3 class="pro-title text-2xl mb-4 text-black">✓ Points Positifs</h3>
+                    <ul class="space-y-3 pro-text text-sm">
+                        <li>• Intégration réussie au sein d'une équipe IT professionnelle et dynamique.</li>
+                        <li>• Grande diversité des missions et des technologies rencontrées sur le terrain.</li>
+                        <li>• Montée en compétence progressive et prise de responsabilités concrètes.</li>
+                        <li>• Contact direct et enrichissant avec les utilisateurs (agents municipaux).</li>
+                    </ul>
+                </div>
+
+                <div class="comic-panel comic-hover border-l-8 border-l-mha-orange">
+                    <h3 class="pro-title text-2xl mb-4 text-black">↗ Axes d'Amélioration</h3>
+                    <ul class="space-y-3 pro-text text-sm">
+                        <li>• Approfondir la maîtrise des architectures réseau avancées (VLAN, routage).</li>
+                        <li>• Développer davantage l'administration et l'automatisation sous Linux.</li>
+                        <li>• Perfectionner l'écriture de scripts complexes pour les tâches d'administration.</li>
+                        <li>• Explorer plus en profondeur les solutions de virtualisation avancées.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE CONTACT -->
+        <section id="page-contact" class="page">
+            <div class="section-header-box border-black">
+                <div>
+                    <h2 class="panel-header-title">Contact & Documents</h2>
+                    <span class="panel-badge">Espace Épreuve E5 — Dossiers & Liens</span>
+                </div>
+            </div>
+            
+            <div class="comic-panel text-center py-12 border-[5px]">
+                <p class="pro-text text-lg mb-8 max-w-2xl mx-auto">
+                    Retrouvez ci-dessous mes documents administratifs pour l'épreuve E5, mon CV ainsi que mes liens professionnels.
+                </p>
+
+                <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-4 max-w-3xl mx-auto">
+                    <button class="comic-btn flex-1 min-w-[220px]" style="background:var(--mha-blue);" onclick="openDoc('CV AREF Farès .pdf', 'Curriculum Vitae — AREF Farès')">
+                        📄 Curriculum Vitae
+                    </button>
+                    <button class="comic-btn flex-1 min-w-[220px]" style="background:var(--mha-yellow); color:black;" onclick="openDoc('Tableau-de-synthèse-Epreuve_E5.xlsx', 'Tableau de synthèse E5')">
+                        📊 Tableau de Synthèse
+                    </button>
+                    <a href="https://www.linkedin.com/in/farès-a-822a40347" target="_blank" rel="noopener" class="comic-btn flex-1 min-w-[220px]" style="background:var(--mha-green); color:black;">
+                        🔗 LinkedIn
+                    </a>
+                    <a href="mailto:faresaref@gmail.com" class="comic-btn flex-1 min-w-[220px]" style="background:#090D16; color:white;">
+                        ✉️ E-mail
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Document Modal Viewer -->
+    <div id="doc-modal">
+        <div class="modal-bar">
+            <span id="doc-modal-title" class="font-head text-2xl tracking-widest text-black">VISUALISATION DOCUMENT</span>
+            <div class="flex gap-4 items-center">
+                <a id="doc-modal-download" href="#" download class="font-bold text-black border-b-2 border-black hover:border-white uppercase text-xs">Télécharger</a>
+                <button onclick="closeDoc()" class="font-head text-xl text-white bg-mha-red border-2 border-black px-3 py-1 hover:bg-black transition duration-200">FERMER</button>
+            </div>
+        </div>
+        <div class="modal-content" id="doc-modal-body" onclick="closeDoc()"></div>
+    </div>
+
+    <!-- Bulle de dialogue Manga volante (Mode OFA) -->
+    <div id="manga-speech-bubble" class="manga-bubble-hidden">"PLUS ULTRA ! Dépasse tes limites !"</div>
+
+    <!-- Footer -->
+    <footer>
+        © 2026 — AREF Farès · BTS SIO SISR · Mairie de Mantes-la-Ville · Tous droits réservés
+    </footer>
+
+    <!-- Scripts: WebGL 3D Background & App Logic -->
+    <script>
+        // --- Activation du mode 100% One For All ---
+        let ofaMode = false;
+        function toggleOFA() {
+            ofaMode = !ofaMode;
+            document.body.classList.toggle('ofa-active', ofaMode);
+            
+            const bubble = document.getElementById('manga-speech-bubble');
+            const btn = document.getElementById('btn-ofa');
+            
+            if (ofaMode) {
+                btn.style.background = 'var(--mha-yellow)';
+                bubble.classList.add('show');
+                powerTarget = 0.9; 
+            } else {
+                btn.style.background = 'var(--mha-green)';
+                bubble.classList.remove('show');
+                powerTarget = 0;
+            }
+        }
+
+        
+
+        // --- Three.js 3D Background Animation: One For All Real Lightning Arcs ---
+        let scene, camera, renderer, lightningGroup;
+        let mouseX = 0, mouseY = 0;
+        let lightningData = [];
+
+        function initThreeJS() {
+            const container = document.getElementById('webgl-container');
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 40;
+
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            lightningGroup = new THREE.Group();
+
+            const numBolts = 16;
+            for (let i = 0; i < numBolts; i++) {
+                const points = [];
+                let current = new THREE.Vector3(
+                    (Math.random() - 0.5) * 60,
+                    (Math.random() - 0.5) * 50,
+                    (Math.random() - 0.5) * 30
+                );
+                points.push(current.clone());
+
+                const segments = 8;
+                for (let s = 0; s < segments; s++) {
+                    current.add(new THREE.Vector3(
+                        (Math.random() - 0.5) * 10,
+                        (Math.random() - 0.5) * 10 + 4,
+                        (Math.random() - 0.5) * 5
+                    ));
+                    points.push(current.clone());
+                }
+
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const material = new THREE.LineBasicMaterial({
+                    color: 0x10B981,
+                    transparent: true,
+                    opacity: 0.8
+                });
+
+                const bolt = new THREE.Line(geometry, material);
+                
+                lightningData.push({
+                    mesh: bolt,
+                    originalPoints: points.map(p => p.clone()),
+                    speed: Math.random() * 0.05 + 0.02
+                });
+
+                lightningGroup.add(bolt);
+            }
+
+            scene.add(lightningGroup);
+
+            addSelectFX();
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('mousemove', onMouseMove);
+        }
+
+        let power = 0, powerTarget = 0, fx = 1, fxTarget = 1, fxGroup, core, ring1, ring2, sparks;
+        let YELLOW;
+
+        function addSelectFX() {
+            YELLOW = new THREE.Color(0xFACC15);
+            fxGroup = new THREE.Group();
+            const wire = (c, o) => new THREE.MeshBasicMaterial({ color: c, wireframe: true, transparent: true, opacity: o });
+            core = new THREE.Mesh(new THREE.IcosahedronGeometry(11, 1), wire(0x10B981, 0.35));
+            ring1 = new THREE.Mesh(new THREE.TorusGeometry(19, 0.3, 8, 80), wire(0xFACC15, 0.7));
+            ring2 = new THREE.Mesh(new THREE.TorusGeometry(25, 0.2, 8, 80), wire(0x2563EB, 0.7));
+            const n = 700, pos = new Float32Array(n * 3);
+            for (let i = 0; i < n; i++) {
+                const r = 25 + Math.random() * 45, a = Math.random() * 6.283, b = Math.acos(2 * Math.random() - 1);
+                pos[i*3] = r * Math.sin(b) * Math.cos(a); pos[i*3+1] = r * Math.sin(b) * Math.sin(a); pos[i*3+2] = r * Math.cos(b);
+            }
+            const g = new THREE.BufferGeometry();
+            g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            sparks = new THREE.Points(g, new THREE.PointsMaterial({ color: 0xFACC15, size: 0.45, transparent: true, opacity: 0.9 }));
+            fxGroup.add(core, ring1, ring2, sparks);
+            fxGroup.position.z = -15;
+            scene.add(fxGroup);
+        }
+
+        function onMouseMove(event) {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animateThreeJS() {
+            requestAnimationFrame(animateThreeJS);
+
+            camera.position.x += (mouseX * 4 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 4 - camera.position.y) * 0.05;
+            power += (powerTarget - power) * 0.04;
+            fx += (fxTarget - fx) * 0.05;
+            camera.position.z = 40 - power * 18 + (power > 0.6 ? (Math.random() - 0.5) * power * 2 : 0);
+            camera.lookAt(scene.position);
+            fxGroup.visible = fx > 0.01;
+            fxGroup.scale.setScalar(Math.max(fx, 0.001) * (1 + power * 0.6));
+            core.rotation.x += 0.004 + power * 0.05; core.rotation.y += 0.006 + power * 0.07;
+            ring1.rotation.x += 0.01 + power * 0.08; ring1.rotation.y += 0.004;
+            ring2.rotation.y += 0.008 + power * 0.06; ring2.rotation.z += 0.005;
+            sparks.rotation.y += 0.0008 + power * 0.01;
+
+            const time = Date.now() * 0.005;
+            lightningData.forEach((item, index) => {
+                const positions = item.mesh.geometry.attributes.position.array;
+                const orig = item.originalPoints;
+
+                for (let j = 0; j < orig.length; j++) {
+                    positions[j * 3] = orig[j].x + (Math.random() - 0.5) * (2.5 + power * 6);
+                    positions[j * 3 + 1] = orig[j].y + (Math.random() - 0.5) * (2.5 + power * 6);
+                    positions[j * 3 + 2] = orig[j].z + (Math.random() - 0.5) * (2.5 + power * 6);
+                }
+                item.mesh.geometry.attributes.position.needsUpdate = true;
+                item.mesh.material.color.set(0x10B981).lerp(YELLOW, power);
+                item.mesh.material.opacity = 0.3 + Math.abs(Math.sin(time * item.speed * 20 + index)) * 0.6;
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            buildRoster();
+            showSelect();
+            initRouter();
+            try {
+                initThreeJS();
+                animateThreeJS();
+            } catch (err) {
+                console.warn('Fond 3D indisponible :', err);
+            }
+        });
+
+        const LOCK = '<svg class="char-lock" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 5a3 3 0 1 1 6 0v3H9V6z"/></svg>';
+        const ROSTER = [
+            { f: 'deku', n: 'DEKU', l: 'D', c: '#10B981' }, { f: 'bakugo', n: 'BAKUGO', l: 'B', c: '#EA580C' }, { f: 'todoroki', n: 'TODOROKI', l: 'T', c: '#2563EB' },
+            { f: 'uraraka', n: 'URARAKA', l: 'U', c: '#EC4899' }, { me: true, f: 'fares', n: 'AREF FARÈS', l: 'AF', c: '#10B981', s: 'Admin Sys & Réseaux' }, { f: 'iida', n: 'IIDA', l: 'I', c: '#0EA5E9' },
+            { f: 'kirishima', n: 'KIRISHIMA', l: 'K', c: '#DC2626' }, { f: 'momo', n: 'MOMO', l: 'M', c: '#8B5CF6' }, { f: 'allmight', n: 'ALL MIGHT', l: 'A', c: '#FACC15' }
+        ];
+        const SIL = '<svg class="char-sil" viewBox="0 0 100 100" aria-hidden="true"><path d="M10 100Q12 64 50 60Q88 64 90 100Z" fill="rgba(0,0,0,.45)" stroke="#000" stroke-width="3"/><circle cx="50" cy="36" r="19" fill="rgba(0,0,0,.45)" stroke="#000" stroke-width="3"/><path d="M36 34h28v7H36z" fill="rgba(255,255,255,.85)" stroke="#000" stroke-width="2"/></svg>';
+        
+        function imgFallback(img) {
+            const ext = ['png', 'jpg', 'webp'], i = +img.dataset.i + 1;
+            if (i < ext.length) { img.dataset.i = i; img.src = 'img/' + img.dataset.f + '.' + ext[i]; } else img.remove();
+        }
+        let launching = false, toastTimer;
+
+        function buildRoster() {
+            const el = document.getElementById('roster');
+            el.innerHTML = '';
+            ROSTER.forEach((r, i) => {
+                const b = document.createElement('button');
+                b.className = 'char-card ' + (r.me ? 'me' : 'locked');
+                b.style.setProperty('--c', r.c);
+                b.style.setProperty('--i', i);
+                b.setAttribute('aria-label', r.me ? 'Choisir le profil AREF Farès' : r.n + ' : verrouillé');
+                b.innerHTML = `<span class="char-bg"></span>${SIL}<img class="char-img" src="img/${r.f}.png" data-f="${r.f}" data-i="0" alt="" onload="this.parentNode.classList.add('has-img')" onerror="imgFallback(this)"><span class="char-letter">${r.l}</span>${r.me ? '<span class="char-tag">TOI</span>' : LOCK}<span class="char-name">${r.n}<small>${r.me ? r.s : 'Verrouillé'}</small></span>`;
+                b.addEventListener('click', () => pickCharacter(b, r));
+                el.appendChild(b);
+            });
+        }
+
+        function showSelect() {
+            launching = false;
+            document.body.classList.add('selecting');
+            document.body.classList.remove('slam');
+            buildRoster();
+            document.getElementById('select-screen').classList.remove('launching', 'gone');
+            document.getElementById('select-bg').classList.remove('gone');
+            powerTarget = 0; fxTarget = 1;
+            window.scrollTo(0, 0);
+        }
+
+        function toast(msg) {
+            const t = document.getElementById('select-toast');
+            t.textContent = msg; t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+        }
+
+        function pickCharacter(card, r) {
+            if (launching) return;
+            if (!r.me) {
+                card.animate([{ translate: '0' }, { translate: '-12px' }, { translate: '12px' }, { translate: '-7px' }, { translate: '0' }], { duration: 400 });
+                toast('🔒 ' + r.n + ' : accès refusé');
+                return;
+            }
+            launching = true;
+            document.getElementById('select-screen').classList.add('launching');
+            card.classList.add('chosen');
+            powerTarget = 1;
+            setTimeout(() => {                       
+                document.getElementById('flash').classList.add('on');
+                document.body.classList.add('shake-active');
+            }, 1150);
+            setTimeout(() => {                       
+                document.getElementById('select-screen').classList.add('gone');
+                document.getElementById('select-bg').classList.add('gone');
+                document.body.classList.remove('selecting', 'shake-active');
+                powerTarget = 0; fxTarget = 0;
+                document.getElementById('flash').classList.remove('on');
+                startIntro();
+            }, 1450);
+        }
+
+        function startIntro() {
+            const intro = document.getElementById('intro-screen');
+            const lines = document.getElementById('action-lines');
+            lines.style.opacity = '0';
+            intro.style.opacity = '1';
+            intro.style.display = 'flex';            
+            showPage('accueil');
+            setTimeout(() => { document.body.classList.add('shake-active'); lines.style.opacity = '1'; }, 1200);
+            setTimeout(() => {
+                intro.style.opacity = '0';
+                document.body.classList.remove('shake-active');
+                document.body.classList.add('slam');
+                const sw = document.getElementById('shockwave');
+                sw.classList.remove('go'); void sw.offsetWidth; sw.classList.add('go');
+                setTimeout(() => intro.style.display = 'none', 500);
+                setTimeout(() => document.body.classList.remove('slam'), 1500);
+            }, 3500);
+        }
+
+        if (matchMedia('(hover: hover)').matches) {
+            const sel = '.char-card, .comic-hover';
+            document.addEventListener('pointermove', e => {
+                const t = e.target.closest && e.target.closest(sel);
+                if (!t) return;
+                const r = t.getBoundingClientRect();
+                const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+                const k = t.classList.contains('char-card') ? 26 : 6;
+                t.style.setProperty('--rx', (-y * k) + 'deg');
+                t.style.setProperty('--ry', (x * k) + 'deg');
+            });
+            document.addEventListener('pointerout', e => {
+                const t = e.target.closest && e.target.closest(sel);
+                if (t && !t.contains(e.relatedTarget)) { t.style.setProperty('--rx', '0deg'); t.style.setProperty('--ry', '0deg'); }
+            });
+        }
+
+        const pages = ['accueil', 'profil', 'entreprise', 'missions', 'realisations', 'competences', 'veille', 'bilan', 'contact'];
+        let currentPage = 'accueil';
+
+        function showPage(pageId) {
+            if (!pages.includes(pageId)) pageId = 'accueil';
+
+            const oldPage = document.getElementById('page-' + currentPage);
+            if (oldPage) {
+                oldPage.classList.remove('active');
+                oldPage.style.animation = 'none';
+            }
+
+            const newPage = document.getElementById('page-' + pageId);
+            if (newPage) {
+                newPage.classList.add('active');
+                void newPage.offsetWidth; 
+                newPage.style.animation = 'panelFadeIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                
+                if (pageId === 'competences') {
+                    setTimeout(() => {
+                        document.querySelectorAll('.skill-fill').forEach(bar => {
+                            bar.style.width = bar.getAttribute('data-target');
+                        });
+                    }, 150);
+                } else {
+                    document.querySelectorAll('.skill-fill').forEach(bar => {
+                        bar.style.width = '0%';
+                    });
+                }
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.page === pageId);
+                if (btn.classList.contains('active')) {
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            });
+
+            currentPage = pageId;
+        }
+
+        function navigate(pageId) {
+            if (pageId === currentPage) return;
+            history.pushState({ page: pageId }, '', '#' + pageId);
+            showPage(pageId);
+        }
+
+        window.addEventListener('popstate', () => {
+            const hash = location.hash.replace('#', '');
+            showPage(pages.includes(hash) ? hash : 'accueil');
+        });
+
+        function initRouter() {
+            const hash = location.hash.replace('#', '');
+            const startPage = pages.includes(hash) ? hash : 'accueil';
+            history.replaceState({ page: startPage }, '', '#' + startPage);
+            showPage(startPage);
+        }
+
+        function openDoc(src, title) {
+            const modal = document.getElementById('doc-modal');
+            const body = document.getElementById('doc-modal-body');
+            const titleEl = document.getElementById('doc-modal-title');
+            const dl = document.getElementById('doc-modal-download');
+
+            titleEl.textContent = title || 'VISUALISATION DOCUMENT';
+            dl.href = src;
+
+            const isPdf = /\.pdf($|\?)/i.test(src);
+            let contentHtml = isPdf 
+                ? `<iframe src="${src}" title="${title}" onclick="event.stopPropagation()"></iframe>`
+                : `<img src="${src}" alt="${title}" onclick="event.stopPropagation()">`;
+            
+            body.innerHTML = contentHtml;
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDoc() {
+            const modal = document.getElementById('doc-modal');
+            modal.classList.remove('open');
+            setTimeout(() => {
+                document.getElementById('doc-modal-body').innerHTML = '';
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && document.getElementById('doc-modal').classList.contains('open')) {
+                closeDoc();
+            }
+        });
+    </script>
+</body>
+</html>

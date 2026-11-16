@@ -1,0 +1,139 @@
+/* ==========================================================================
+   wow.css — couche « effet WOW » : typographie, ambiance, rideau de
+   transition, cartes 3D, curseur, barre de progression.
+   Chargée après white.css ; aucune information n'est retirée.
+   ========================================================================== */
+:root{
+ --font:'Outfit',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+ --blue:#0071e3;--blue-2:#4f8cff;--violet:#7c6cff;--cyan:#2cc6ff;
+ --ease-out:cubic-bezier(.16,1,.3,1);
+}
+body{background:#fff}
+
+/* ---------- Typographie : plus serrée, plus éditoriale ---------- */
+h1,h2,h3{font-family:var(--font);letter-spacing:-.035em}
+h2{font-weight:600;line-height:1.04}
+.eyebrow{font-family:var(--mono);letter-spacing:.14em}
+
+/* ---------- Mots et lettres découpés ---------- */
+.wow-word{display:inline-block;overflow:hidden;vertical-align:top;padding:0 .02em .12em;margin:0 -.02em -.12em}
+.wow-inner{display:inline-block;will-change:transform}
+h2>.wow-word,.hero-role>.wow-word,.wow-word .wow-inner{color:inherit}
+.wow-char{display:inline-block;will-change:transform,opacity,filter}
+
+/* ---------- Ambiance : halos pastel + grille interactive ---------- */
+.wow-ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.wow-ambient i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;will-change:transform}
+.wow-ambient i:nth-child(1){width:46vw;height:46vw;left:-12vw;top:-16vw;background:#dbe8ff;animation:wowFloat1 22s ease-in-out infinite alternate}
+.wow-ambient i:nth-child(2){width:38vw;height:38vw;right:-10vw;top:22vh;background:#ece6ff;animation:wowFloat2 26s ease-in-out infinite alternate}
+.wow-ambient i:nth-child(3){width:34vw;height:34vw;left:30vw;bottom:-20vw;background:#dff6ff;animation:wowFloat3 30s ease-in-out infinite alternate}
+@keyframes wowFloat1{to{transform:translate(14vw,10vh) scale(1.15)}}
+@keyframes wowFloat2{to{transform:translate(-12vw,-8vh) scale(.9)}}
+@keyframes wowFloat3{to{transform:translate(-10vw,-14vh) scale(1.2)}}
+.wow-grid{position:absolute;inset:0;
+ background-image:radial-gradient(circle,#0071e340 1px,transparent 1.4px);background-size:28px 28px;
+ -webkit-mask-image:radial-gradient(260px circle at var(--cx,50%) var(--cy,40%),#000 0%,transparent 70%);
+ mask-image:radial-gradient(260px circle at var(--cx,50%) var(--cy,40%),#000 0%,transparent 70%);
+ opacity:.9;transition:opacity .4s}
+#experience-shell{position:relative;z-index:1}
+.header{background:#ffffffb8}
+.footer,.page-controls{z-index:30}
+
+/* ---------- Barre de progression des rubriques ---------- */
+.wow-progress{position:fixed;left:0;top:0;height:2px;width:100%;z-index:40;pointer-events:none;
+ background:linear-gradient(90deg,var(--blue),var(--violet),var(--cyan));transform-origin:0 50%;transform:scaleX(.1);
+ transition:transform .9s var(--ease-out);box-shadow:0 0 12px #0071e366}
+
+/* ---------- Indicateur de navigation glissant ---------- */
+#navigation{position:relative}
+.wow-nav-pill{position:absolute;left:0;top:50%;height:32px;margin-top:-16px;border-radius:99px;z-index:-1;pointer-events:none;
+ background:#f0f4fb;box-shadow:inset 0 0 0 1px #e3eaf5;opacity:0;transition:opacity .3s}
+.wow-nav-pill.is-visible{opacity:1}
+#navigation a{position:relative;z-index:1}
+
+/* ---------- Rideau de transition entre rubriques ---------- */
+.wow-curtain{position:fixed;inset:0;z-index:60;pointer-events:none;visibility:hidden}
+.wow-curtain>div{position:absolute;inset:0;clip-path:inset(100% 0 0 0)}
+.wow-curtain .wc-back{background:linear-gradient(120deg,var(--blue),var(--violet))}
+.wow-curtain .wc-front{background:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px}
+.wc-front::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,#0071e324 1px,transparent 1.4px);background-size:28px 28px;
+ -webkit-mask-image:radial-gradient(ellipse at center,#000 10%,transparent 65%);mask-image:radial-gradient(ellipse at center,#000 10%,transparent 65%)}
+.wc-index{position:relative;font-family:var(--mono);font-size:13px;letter-spacing:.3em;color:var(--blue);overflow:hidden}
+.wc-title{position:relative;font-family:var(--font);font-weight:600;letter-spacing:-.05em;font-size:clamp(48px,8vw,120px);line-height:1;color:#1d1d1f;overflow:hidden;padding:.05em .1em .12em}
+.wc-title span,.wc-index span{display:inline-block}
+.wc-line{position:relative;width:min(320px,60vw);height:1px;background:#e5e5ea;overflow:hidden}
+.wc-line i{position:absolute;inset:0;background:linear-gradient(90deg,var(--blue),var(--violet));transform-origin:0 50%;transform:scaleX(0)}
+
+/* ---------- Cartes : relief 3D + reflet ---------- */
+.wow-tilt{position:relative;transform-style:preserve-3d;will-change:transform;
+ transition:box-shadow .5s var(--ease-out),background .3s!important}
+.wow-tilt:hover{box-shadow:0 30px 60px -28px #1d3a6b40,0 0 0 1px #e3eaf5}
+.wow-glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3;opacity:0;transition:opacity .4s;
+ background:radial-gradient(420px circle at var(--gx,50%) var(--gy,50%),#ffffffd9,#ffffff00 45%),
+            radial-gradient(260px circle at var(--gx,50%) var(--gy,50%),#0071e314,transparent 60%)}
+.wow-tilt:hover .wow-glare{opacity:1}
+.mission,.bilan-grid article,.company-metrics>div{overflow:hidden}
+.mission .line-icon{display:inline-block;transition:transform .6s var(--ease-out),color .3s}
+.mission:hover .line-icon{transform:translateZ(30px) scale(1.18) rotate(-6deg);color:var(--blue)}
+.mission h3,.mission p{transition:transform .6s var(--ease-out)}
+.mission:hover h3{transform:translateZ(20px)}
+
+/* ---------- Boutons magnétiques ---------- */
+.button{transition:background .3s,box-shadow .3s!important;position:relative;overflow:hidden;isolation:isolate}
+.button.primary{background:linear-gradient(120deg,var(--blue),#2a7bff 55%,var(--violet));background-size:200% 100%;background-position:0 0;
+ box-shadow:0 10px 30px -12px #0071e3aa}
+.button.primary:hover{background-position:100% 0;box-shadow:0 18px 40px -14px #5a5cffcc}
+.button.primary{transition:background-position .6s var(--ease-out),box-shadow .3s!important}
+.button::after{content:'';position:absolute;top:0;bottom:0;left:-60%;width:40%;z-index:-1;
+ background:linear-gradient(100deg,transparent,#ffffff70,transparent);transform:skewX(-20deg);transition:left .8s var(--ease-out)}
+.button:hover::after{left:130%}
+.button span{display:inline-block;transition:transform .5s var(--ease-out)}
+.button:hover span{transform:translate(3px,-2px)}
+.wow-magnet{will-change:transform}
+
+/* ---------- Curseur secondaire (souris uniquement) ---------- */
+.wow-cursor,.wow-cursor-dot{position:fixed;left:0;top:0;z-index:70;pointer-events:none;border-radius:50%}
+.wow-cursor{width:38px;height:38px;margin:-19px 0 0 -19px;border:1px solid #0071e366;
+ transition:width .35s var(--ease-out),height .35s var(--ease-out),margin .35s var(--ease-out),background .35s,border-color .35s,opacity .3s}
+.wow-cursor-dot{width:6px;height:6px;margin:-3px 0 0 -3px;background:var(--blue);transition:opacity .3s,transform .3s}
+.wow-cursor.is-hover{width:64px;height:64px;margin:-32px 0 0 -32px;background:#0071e312;border-color:#0071e300}
+.wow-cursor.is-down{width:30px;height:30px;margin:-15px 0 0 -15px}
+.wow-cursor.is-hidden,.wow-cursor-dot.is-hidden{opacity:0}
+@media (pointer:coarse){.wow-cursor,.wow-cursor-dot{display:none}}
+
+/* ---------- Héros ---------- */
+.hero-content{position:relative;z-index:2}
+#globe-scene{will-change:transform}
+.hero .eyebrow .status-dot{box-shadow:0 0 0 0 #0071e366;animation:wowPing 2.2s ease-out infinite}
+@keyframes wowPing{0%{box-shadow:0 0 0 0 #0071e366}80%,100%{box-shadow:0 0 0 10px #0071e300}}
+.wow-scroll-hint{display:inline-block;animation:wowBob 1.8s ease-in-out infinite}
+@keyframes wowBob{50%{transform:translateY(4px)}}
+
+/* ---------- Frise chronologique qui se dessine ---------- */
+.timeline{border-left-color:transparent!important;position:relative}
+.wow-timeline-line{position:absolute;left:-1px;top:0;bottom:0;width:1px;background:#dedee3;overflow:hidden}
+.wow-timeline-line i{position:absolute;inset:0;background:linear-gradient(180deg,var(--blue),var(--violet));transform-origin:50% 0;transform:scaleY(0)}
+
+/* ---------- Petits détails ---------- */
+.tags span{transition:transform .4s var(--ease-out),background .3s,color .3s}
+.tags span:hover{transform:translateY(-3px);background:#0071e3;color:#fff}
+.email-link{background:linear-gradient(90deg,var(--blue),var(--violet)) 0 100%/0 2px no-repeat;transition:background-size .6s var(--ease-out)}
+.email-link:hover{background-size:100% 2px}
+.company-metrics strong{font-variant-numeric:tabular-nums}
+::selection{background:#0071e3;color:#fff}
+
+
+/* ---------- Petits boutons précédent / suivant en bas de page ---------- */
+.page-controls{pointer-events:none}
+.page-controls>*{pointer-events:auto}
+.page-controls button{min-width:0!important;gap:8px!important;padding:7px 14px 7px 7px!important;border-radius:99px;
+ background:#ffffffcc!important;border:1px solid #e3e6ec!important;color:#1d1d1f!important;font-size:12px!important;
+ backdrop-filter:blur(12px);box-shadow:0 6px 18px -10px #1d3a6b40;transition:border-color .3s,box-shadow .3s,opacity .3s!important}
+#next-page{padding:7px 7px 7px 14px!important}
+.page-controls button .wow-arrow{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;
+ background:linear-gradient(120deg,var(--blue),var(--violet));color:#fff;font-size:13px;flex:none;transition:transform .4s var(--ease-out)}
+.page-controls button:hover:not(:disabled){border-color:#c9d6ee!important;box-shadow:0 10px 24px -10px #0071e366}
+#previous-page:hover:not(:disabled) .wow-arrow{transform:translateX(-3px)}
+#next-page:hover:not(:disabled) .wow-arrow{transform:translateX(3px)}
+.page-controls button:disabled{opacity:0!important;pointer-events:none}
+@media (max-width:760px){.page-controls button span:not(.wow-arrow){display:none}.page-controls button{padding:5px!important}}

@@ -1,0 +1,260 @@
+/* ==========================================================================
+   settings.css — bouton « Réglages » et ses trois options :
+   thème sombre, réduction des animations, mode oral.
+   Chargée en dernier ; ne retire aucun contenu.
+   ========================================================================== */
+
+/* ---------- Bouton et panneau ---------- */
+.settings{position:relative;flex-shrink:0}
+.settings-toggle{display:inline-flex;align-items:center;gap:9px;height:36px;padding:0 14px 0 11px;border-radius:99px;
+ border:1px solid #e3e6ec;background:#ffffffcc;color:#33333a;font-size:12px;font-weight:500;line-height:1;
+ transition:border-color .3s,background .3s,color .3s}
+.settings-toggle:hover,.settings-toggle[aria-expanded=true]{border-color:#c9d6ee;color:#0071e3}
+.settings-toggle svg{flex:none}
+.settings-panel{position:absolute;right:0;top:calc(100% + 12px);width:min(330px,88vw);padding:10px;border-radius:20px;
+ background:#fff;border:1px solid #e6e9ef;box-shadow:0 24px 60px -18px #1d3a6b40;z-index:5}
+.settings-panel[hidden]{display:none}
+.settings-title{font:600 10px var(--mono);letter-spacing:.14em;color:#7b8594;margin:8px 12px 6px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;padding:12px;border:0;border-radius:13px;
+ background:none;text-align:left;transition:background .25s}
+.settings-row:hover{background:#f3f6fb}
+.settings-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+.settings-text strong{font-size:14px;font-weight:600;letter-spacing:-.01em;color:#1d1d1f}
+.settings-text small{font-size:11.5px;line-height:1.4;color:#6b7482}
+.settings-switch{position:relative;flex:none;width:40px;height:24px;border-radius:99px;background:#d5d9e0;transition:background .3s}
+.settings-switch::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;
+ box-shadow:0 1px 3px #0003;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.settings-row[aria-checked=true] .settings-switch{background:#0071e3}
+.settings-row[aria-checked=true] .settings-switch::after{transform:translateX(16px)}
+.settings-go{flex:none;padding:6px 12px;border-radius:99px;background:#0071e3;color:#fff;font-size:12px;font-weight:500;white-space:nowrap}
+.settings-keys{margin:6px 12px 8px;padding-top:10px;border-top:1px solid #eceef2;font-size:11px;color:#6b7482}
+kbd{display:inline-block;min-width:20px;padding:1px 5px;margin:0 2px;border:1px solid #d9dde4;border-bottom-width:2px;border-radius:5px;
+ background:#f7f8fa;font:10px var(--mono);text-align:center;color:#3c4350}
+@media(max-width:1380px){.settings-toggle{width:36px;padding:0;justify-content:center}.settings-toggle>span{display:none}}
+/* Jusqu'à 1000 px, les dix rubriques ne tiennent plus sur une ligne : menu déroulant. */
+@media(max-width:1000px){.settings{position:static;order:2;margin-left:auto}.menu-toggle{order:3;margin-left:16px}.header nav{order:4}
+ .settings-panel{right:4%;top:calc(100% + 8px)}
+ /* Le menu des rubriques s'ouvre sous l'en-tête, sur toute la largeur. */
+ .header #navigation{position:fixed}}
+@media(max-width:760px){.settings-panel{left:5%;right:5%;width:auto}}
+@media(min-width:761px) and (max-width:1000px){
+ .brand>span:not(.brand-mark){display:block}
+ .menu-toggle{display:flex;gap:12px;align-items:center;background:none;border:0;color:#6e6e73;padding:10px 0;font-size:13px}
+ .header nav{display:none;left:0;right:0;top:70px;padding:22px 4%;background:#fffffff5;border-bottom:1px solid #e5e5e7;backdrop-filter:blur(25px);
+  gap:6px 30px;grid-template-columns:repeat(3,1fr);box-shadow:0 20px 30px #1d1d1f08;font-size:14px}
+ .header nav.open{display:grid}
+ .header nav>a{padding:12px 0}
+ .header nav>a.active:after{right:auto;width:36px}}
+
+/* ---------- Réduire les animations ---------- */
+html.reduce-motion:root *,html.reduce-motion:root *::before,html.reduce-motion:root *::after{animation:none!important;transition:none!important}
+html.reduce-motion .wow-glare,html.reduce-motion .wow-grid{display:none!important}
+html.reduce-motion .wow-ambient i{opacity:.35}
+html.reduce-motion .rubric-draw{stroke-dashoffset:0!important}
+html.reduce-motion .wow-timeline-line i{transform:none!important}
+
+/* ---------- Mode oral ---------- */
+#oral-bar{position:fixed;left:0;right:0;bottom:0;height:46px;z-index:35;display:flex;align-items:center;justify-content:space-between;gap:20px;
+ padding:0 3%;background:#ffffffe6;border-top:1px solid #e6e9ef;backdrop-filter:blur(16px);font-size:12px;color:#55606f}
+#oral-bar[hidden]{display:none}
+#oral-bar>span{display:flex;align-items:center;gap:14px;min-width:0;white-space:nowrap}
+.oral-left b{font:600 10px var(--mono);letter-spacing:.14em;color:#0071e3}
+#oral-step{font:11px var(--mono);color:#7b8594}
+#oral-label{font-size:13px;font-weight:500;color:#1d1d1f;overflow:hidden;text-overflow:ellipsis}
+.oral-keys{gap:6px!important;font-size:11px}.oral-keys i{font-style:normal;margin:0 4px;color:#b3bac5}
+#oral-bar button{height:30px;padding:0 13px;border-radius:99px;border:1px solid #e0e4ea;background:none;font-size:12px;color:#33333a}
+#oral-bar button:hover{border-color:#c9d6ee;color:#0071e3}
+#oral-timer{font:12px var(--mono)!important;font-variant-numeric:tabular-nums;min-width:66px}
+html.oral-mode .header,html.oral-mode .footer,html.oral-mode .page-controls,html.oral-mode .wow-progress{display:none!important}
+html.oral-mode #page-stage{top:22px;bottom:58px;left:max(3%,calc((100vw - 1500px)/2));right:max(3%,calc((100vw - 1500px)/2))}
+@media(max-width:900px){.oral-keys{display:none!important}}
+
+/* ==========================================================================
+   Thème sombre
+   ========================================================================== */
+html[data-theme=dark]{color-scheme:dark;--bg:#0b0e14;--text:#f1f3f7;--muted:#a4adbb;--line:#252c38;--panel:#141a23}
+[data-theme=dark] body{background:#0b0e14;color:#f1f3f7}
+[data-theme=dark] h2>span:not(.wow-word),[data-theme=dark] .hero-role>span:not(.wow-word){color:#8d97a8}
+[data-theme=dark] .eyebrow,[data-theme=dark] .hero .eyebrow,[data-theme=dark] .brand-sub,[data-theme=dark] .small,[data-theme=dark] .location-chip,[data-theme=dark] .orbit-label{color:#8d97a8}
+[data-theme=dark] .route-page{scrollbar-color:#3a4353 transparent}
+
+/* En-tête, navigation, pied */
+[data-theme=dark] .header{background:#0b0e14c7;border-bottom-color:#1e2430}
+[data-theme=dark] .header nav>a{color:#9aa4b4}
+[data-theme=dark] .header nav>a:hover,[data-theme=dark] .header nav>a.active{color:#fff}
+[data-theme=dark] .header nav>a.active:after{background:#fff}
+[data-theme=dark] .wow-nav-pill{background:#171d28;box-shadow:inset 0 0 0 1px #252d3b}
+[data-theme=dark] .menu-toggle{color:#b4bdca}
+@media(max-width:1000px){[data-theme=dark] .header nav{background:#0d1118f5;border-bottom-color:#252c38}}
+[data-theme=dark] .footer{border-top-color:#1e2430}
+[data-theme=dark] .footer,[data-theme=dark] .footer button,[data-theme=dark] .page-position,[data-theme=dark] .page-position #page-label{color:#8d97a8}
+[data-theme=dark] .footer button:hover{color:#6cb2ff}
+[data-theme=dark] .page-position #page-current{color:#d5dbe5}
+[data-theme=dark] .page-position-line{background:#2c3443}
+[data-theme=dark] .page-controls button{background:#141a24cc!important;border-color:#283142!important;color:#f1f3f7!important}
+[data-theme=dark] .page-controls button:hover:not(:disabled){border-color:#3b4a66!important}
+
+/* Boutons et liens */
+[data-theme=dark] .secondary{color:#6cb2ff;border-color:#2a3546}
+[data-theme=dark] .secondary:hover{background:#142033}
+[data-theme=dark] .text-link,[data-theme=dark] .project-discover,[data-theme=dark] .email-link,[data-theme=dark] .skill-evidence button{color:#6cb2ff}
+[data-theme=dark] .tags span{background:#171d28;color:#b9c2cf;border-color:#252d3b}
+[data-theme=dark] .tags span:hover{background:#0071e3;color:#fff}
+
+/* Accueil */
+[data-theme=dark] .hero h1>span,[data-theme=dark] .hero-role{color:#f1f3f7}
+[data-theme=dark] .hero-description{color:#aab3c1}
+[data-theme=dark] #globe-scene:after{background:#00000066}
+[data-theme=dark] .globe-fallback{background:radial-gradient(circle at 35% 28%,#3a475c,#1b2433 58%,#0e141e);box-shadow:inset -20px -15px 45px #0006,0 35px 70px #0006}
+[data-theme=dark] .wow-ambient i{opacity:.42}
+[data-theme=dark] .wow-ambient i:nth-child(1){background:#12305e}
+[data-theme=dark] .wow-ambient i:nth-child(2){background:#2a1f5c}
+[data-theme=dark] .wow-ambient i:nth-child(3){background:#0f3a4d}
+[data-theme=dark] .wow-grid{background-image:radial-gradient(circle,#4da3ff55 1px,transparent 1.4px)}
+
+/* Profil */
+[data-theme=dark] .profile-copy .large-copy{color:#dfe4ec}
+[data-theme=dark] .identity-symbol{background:linear-gradient(150deg,#1d2533,#141a25);color:#b9c7dc}
+[data-theme=dark] .identity-symbol>span{color:#7f93b0}
+[data-theme=dark] .timeline article>span,[data-theme=dark] .identity>div>span,[data-theme=dark] .photo-credit,[data-theme=dark] .company-metrics span,[data-theme=dark] .travel-stops button{color:#8d97a8}
+[data-theme=dark] .timeline article:before{background:#3a4353;border-color:#0b0e14}
+[data-theme=dark] .timeline .current:before{background:#3d9bff}
+[data-theme=dark] .wow-timeline-line{background:#262d3a}
+
+/* Entreprise */
+[data-theme=dark] .travel-stage{background:#111722}
+[data-theme=dark] .travel-earth{background:radial-gradient(#1a2333,#0d121b)}
+[data-theme=dark] .travel-stops button.active{color:#6cb2ff;border-color:#6cb2ff}
+[data-theme=dark] .travel-stops>span{color:#3d4656}
+[data-theme=dark] .company-story strong{color:#e8ecf2}
+[data-theme=dark] .company-chain,[data-theme=dark] .sources,[data-theme=dark] .mission-tag,[data-theme=dark] .skill-evidence>span{color:#8d97a8}
+[data-theme=dark] .company-chain b{color:#4a5364}
+
+/* Missions et projets */
+[data-theme=dark] .mission{background:#141a23}
+[data-theme=dark] .mission:hover{background:#18202c}
+[data-theme=dark] .line-icon{color:#7fa8dc}
+[data-theme=dark] .bilan-grid article{background:#141a23}
+[data-theme=dark] .filters button{color:#8d97a8}
+[data-theme=dark] .filters button.active{color:#fff;background:#1f2633}
+[data-theme=dark] .filters small{color:#6f7a8b}
+[data-theme=dark] #project-list .project-row{background:#141a23;border-color:#212938}
+[data-theme=dark] #project-list .project-row:nth-child(2){background:#131b25}
+[data-theme=dark] #project-list .project-row:nth-child(3){background:#151a24}
+[data-theme=dark] #project-list .project-row:nth-child(4){background:#131b20}
+[data-theme=dark] .project-category{color:#93a0b3}
+[data-theme=dark] #project-list .project-row p{color:#a4adbb}
+[data-theme=dark] .project-discover>span{background:#222b3a}
+[data-theme=dark] #project-list .project-visual,[data-theme=dark] .project-visual svg{color:#8aa6cc}
+[data-theme=dark] .project-visual svg text,[data-theme=dark] .project-detail-visual text{fill:#9fb4d0!important}
+[data-theme=dark] .wow-tilt:hover{box-shadow:0 30px 60px -28px #000000aa,0 0 0 1px #2a3446}
+[data-theme=dark] .wow-glare{background:radial-gradient(420px circle at var(--gx,50%) var(--gy,50%),#ffffff14,#ffffff00 45%),radial-gradient(260px circle at var(--gx,50%) var(--gy,50%),#3d9bff1f,transparent 60%)}
+
+/* Compétences */
+[data-theme=dark] .skill-network{background:radial-gradient(ellipse,#152033,transparent 66%)}
+[data-theme=dark] .skill-network>svg{stroke:#3c4d68}
+[data-theme=dark] .network-hub{background:linear-gradient(130deg,#222c3c,#141b27);border-color:#2b3649;box-shadow:0 15px 30px #00000055;color:#f1f3f7}
+[data-theme=dark] .network-hub small{color:#8ea3c2}
+[data-theme=dark] .skill-node{background:#141a23;border-color:#2a3344;color:#b4bdca}
+[data-theme=dark] .skill-node.active,[data-theme=dark] .skill-node:hover{background:#0071e3;color:#fff;border-color:#0071e3}
+[data-theme=dark] .skill-detail{background:#141a23}
+[data-theme=dark] .skill-detail .tags span{background:#1f2633}
+[data-theme=dark] .meter{background:#2a3241}
+[data-theme=dark] .meter span{background:#3d9bff}
+[data-theme=dark] .meter-label{color:#8d97a8}
+[data-theme=dark] .skill-evidence{border-top-color:#2a3241}
+
+/* Veille */
+[data-theme=dark] .watch-status{color:#8d97a8}
+[data-theme=dark] .watch-layout{background:#141a23}
+[data-theme=dark] .watch-sidebar{border-color:#232b39}
+[data-theme=dark] .watch-sidebar button{color:#8d97a8}
+[data-theme=dark] .watch-sidebar button.active{background:#1f2633;color:#fff}
+[data-theme=dark] .radar{border-color:#34496a;background:repeating-radial-gradient(circle,transparent 0,transparent 19px,#5f7fb044 20px,transparent 21px)}
+[data-theme=dark] .radar i,[data-theme=dark] .radar-blip{background:#7fa8dc}
+[data-theme=dark] .radar-caption{color:#7888a0}
+[data-theme=dark] .watch-note{background:#1b2230}
+[data-theme=dark] .watch-note strong{color:#f1f3f7}
+[data-theme=dark] .sources>span{color:#6f7a8b}
+[data-theme=dark] .sources a:hover,[data-theme=dark] .contact-links a:hover{color:#6cb2ff}
+
+/* Contact */
+[data-theme=dark] .contact-links{color:#a4adbb}
+[data-theme=dark] input,[data-theme=dark] textarea{background:#11161f;border-color:#2c3545;color:#f1f3f7}
+
+/* Fenêtres de projet et tableau de synthèse */
+[data-theme=dark] dialog{background:#10141c;color:#f1f3f7;box-shadow:0 30px 100px #000a}
+[data-theme=dark] dialog::backdrop{background:#04070ccc}
+[data-theme=dark] .dialog-close,[data-theme=dark] #project-dialog .dialog-close{background:#232b39;color:#c9d1dd}
+[data-theme=dark] dialog img{background:#151a23}
+[data-theme=dark] .project-detail-hero .project-detail-subtitle{color:#a4adbb}
+[data-theme=dark] .project-detail-visual{background:linear-gradient(135deg,#151a23,#131c28);color:#8aa6cc}
+[data-theme=dark] .story-number{color:#8d9bb0}
+[data-theme=dark] .project-story p{color:#aab3c1}
+[data-theme=dark] .project-result{background:#151a23}
+[data-theme=dark] .architecture span{background:#171d28;color:#a9bcd8}
+[data-theme=dark] .project-architecture .architecture span{border-color:#273042;background:#151b25;color:#c9d6e8}
+[data-theme=dark] .architecture b{color:#5f6f88}
+[data-theme=dark] .project-documents{border-top-color:#252c38}
+[data-theme=dark] .project-evidence-gallery img{border-color:#273042}
+[data-theme=dark] .project-evidence-gallery figcaption{color:#8d9bb0}
+[data-theme=dark] #synthesis-dialog{border-color:#252c38}
+[data-theme=dark] .synthesis-toolbar{border-bottom-color:#252c38}
+[data-theme=dark] #synthesis-pdf{background:#151a23}
+
+/* Illustrations de rubrique */
+[data-theme=dark] .rubric-art svg{stroke:#7d8da6}
+[data-theme=dark] .rubric-art stop:nth-child(1){stop-color:#2e394c}
+[data-theme=dark] .rubric-art stop:nth-child(2){stop-color:#1d2533}
+[data-theme=dark] .rubric-art stop:nth-child(3){stop-color:#151b26}
+[data-theme=dark] .rubric-art text{fill:#c5d2e3}
+[data-theme=dark] .rubric-art circle[fill="#e8eef5"]{fill:#1d2533}
+
+/* Rideau de transition */
+[data-theme=dark] .wow-curtain .wc-front{background:#0b0e14}
+[data-theme=dark] .wc-title{color:#f1f3f7}
+[data-theme=dark] .wc-line{background:#252c38}
+
+/* Introduction */
+[data-theme=dark] #boot-screen{background:#0b0e14;color:#e6ecf5}
+[data-theme=dark] #skip-intro{color:#93a0b3}
+[data-theme=dark] .boot-terminal{background:#10151d;border-color:#232b39;box-shadow:0 35px 100px #0008}
+[data-theme=dark] .boot-topbar{border-color:#232b39;color:#8d9bb0}
+[data-theme=dark] .cipher-dot{background:#5d6b80}
+[data-theme=dark] .cipher-ref{color:#6f7d92}
+[data-theme=dark] .cipher-seal{color:#7f8fa8}
+[data-theme=dark] #cipher-status,[data-theme=dark] .cipher-subtitle{color:#8d9bb0}
+[data-theme=dark] .boot-body h1>span{color:#f1f3f7}
+[data-theme=dark] .cipher-letter.is-encoded{color:#5d6b80;background:#171d28}
+[data-theme=dark] .cipher-letter.is-decoded{color:#f1f3f7;background:transparent}
+[data-theme=dark] .boot-command-row{border-color:#232b39;color:#7888a0;background:#0d1219}
+[data-theme=dark] .boot-line{color:#a4adbb}
+[data-theme=dark] .boot-line>span:first-child{color:#556176}
+[data-theme=dark] .boot-line b{color:#6fd3a8}
+[data-theme=dark] .boot-bottom{color:#8d9bb0}
+[data-theme=dark] .boot-bottom b{color:#3d9bff}
+[data-theme=dark] .boot-meter{background:#1d2431}
+[data-theme=dark] .boot-meter span{background:#3d9bff}
+[data-theme=dark] .cipher-unlocked .cipher-seal,[data-theme=dark] .cipher-unlocked #cipher-status{color:#3d9bff}
+[data-theme=dark] .cipher-unlocked .cipher-dot{background:#3d9bff}
+
+/* Réglages et barre du mode oral */
+[data-theme=dark] .settings-toggle{background:#141a24cc;border-color:#283142;color:#d5dbe5}
+[data-theme=dark] .settings-toggle:hover,[data-theme=dark] .settings-toggle[aria-expanded=true]{border-color:#3b4a66;color:#6cb2ff}
+[data-theme=dark] .settings-panel{background:#121720;border-color:#262e3c;box-shadow:0 24px 60px -18px #000c}
+[data-theme=dark] .settings-title,[data-theme=dark] .settings-text small,[data-theme=dark] .settings-keys{color:#8d97a8}
+[data-theme=dark] .settings-row:hover{background:#1a212d}
+[data-theme=dark] .settings-text strong{color:#f1f3f7}
+[data-theme=dark] .settings-switch{background:#394252}
+[data-theme=dark] .settings-keys{border-top-color:#252c38}
+[data-theme=dark] kbd{background:#1a212d;border-color:#323c4d;color:#c9d1dd}
+[data-theme=dark] #oral-bar{background:#0b0e14e6;border-top-color:#1e2430;color:#9aa4b4}
+[data-theme=dark] .oral-left b{color:#6cb2ff}
+[data-theme=dark] #oral-step{color:#8d97a8}
+[data-theme=dark] #oral-label{color:#f1f3f7}
+[data-theme=dark] .oral-keys i{color:#4a5364}
+[data-theme=dark] #oral-bar button{border-color:#283142;color:#d5dbe5}
+[data-theme=dark] #oral-bar button:hover{border-color:#3b4a66;color:#6cb2ff}
+
+/* L’ accueil reste rogné à son cadre : le globe déborde volontairement. */
+.route-page.hero.presentation-fit{overflow:hidden}
