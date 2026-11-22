@@ -1,126 +1,6 @@
 'use strict';
 (() => {
  const animated=()=>!paused;
- /* ── Itinéraire GPS : H3 Campus (Poissy) → Mairie de Mantes-la-Ville ── */
- const root=document.getElementById('travel-stage');
- const map=document.getElementById('travel-map'),ctx=map.getContext('2d');
- const photo=root.querySelector('.mairie-photo'),title=root.querySelector('.destination-title'),ui=root.querySelector('.gps-ui');
- const skip=document.getElementById('travel-skip'),compass=root.querySelector('.gps-compass i');
- const out={icon:document.getElementById('gps-icon'),dist:document.getElementById('gps-distance'),text:document.getElementById('gps-instruction'),time:document.getElementById('gps-time'),km:document.getElementById('gps-km'),arrival:document.getElementById('gps-arrival')};
- const LON0=1.88,LAT0=48.95,KX=111.32*Math.cos(LAT0*Math.PI/180),KY=110.57;
- const P=([lon,lat])=>[(lon-LON0)*KX,(lat-LAT0)*KY];
- function smooth(pts,steps=6){const o=[];for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;for(let s=0;s<steps;s++){const t=s/steps,t2=t*t,t3=t2*t;o.push([0,1].map(k=>.5*(2*p1[k]+(p2[k]-p0[k])*t+(2*p0[k]-5*p1[k]+4*p2[k]-p3[k])*t2+(3*p1[k]-p0[k]-3*p2[k]+p3[k])*t3)));}}o.push(pts[pts.length-1]);return o;}
- const line=c=>smooth(c.map(P));
- const ROUTE_LL=[[2.045,48.929],[2.031,48.923],[2.011,48.918],[1.990,48.915],[1.960,48.925],[1.925,48.935],[1.890,48.945],[1.860,48.952],[1.830,48.957],[1.800,48.960],[1.770,48.962],[1.745,48.963],[1.731,48.966],[1.720,48.970],[1.712,48.9745]];
- const route=line(ROUTE_LL),cum=[0];
- for(let i=1;i<route.length;i++)cum.push(cum[i-1]+Math.hypot(route[i][0]-route[i-1][0],route[i][1]-route[i-1][1]));
- const TOTAL=cum[cum.length-1],JUNCTION=cum[3*6],EXIT=cum[11*6],MINUTES=27;
- const ROADS={
-  highway:[line([[2.10,48.875],[2.06,48.885],[2.02,48.900],[1.990,48.915],...ROUTE_LL.slice(4,12),[1.71,48.962],[1.68,48.960],[1.64,48.958]]),line([[1.990,48.915],[2.03,48.905],[2.07,48.902],[2.13,48.900]])],
-  main:[line([[2.02,48.925],[1.98,48.930],[1.93,48.945],[1.88,48.958],[1.84,48.962],[1.80,48.967],[1.75,48.972],[1.712,48.9745]]),line([[2.04,48.935],[2.00,48.945],[1.97,48.965],[1.93,48.982],[1.90,48.990],[1.86,48.985],[1.82,48.982],[1.78,48.980],[1.74,48.985],[1.70,48.988]]),line([[2.045,48.929],[2.06,48.90],[2.07,48.88]]),line([[1.71,48.94],[1.712,48.9745],[1.715,48.995],[1.72,49.02]]),line([[1.905,48.985],[1.908,49.01],[1.91,49.03]]),line([[1.855,48.960],[1.86,48.93],[1.87,48.90]])]
- };
- const SEINE=line([[2.15,48.955],[2.10,48.948],[2.06,48.940],[2.040,48.936],[2.02,48.942],[1.995,48.950],[1.985,48.960],[1.99,48.975],[1.96,48.99],[1.93,49.000],[1.91,49.002],[1.885,48.996],[1.86,48.990],[1.83,48.988],[1.80,48.986],[1.77,48.988],[1.74,48.993],[1.72,48.996],[1.69,49.002],[1.64,49.01]]);
- function blob(lon,lat,r,sx=1,sy=1,s=1){const[cx,cy]=P([lon,lat]),pts=[];for(let i=0;i<48;i++){const a=i/48*Math.PI*2,k=r*(1+.16*Math.sin(3*a+s)+.09*Math.sin(5*a+2*s)+.05*Math.sin(8*a+3*s));pts.push([cx+Math.cos(a)*k*sx,cy+Math.sin(a)*k*sy]);}return pts;}
- const TOWNS=[[2.040,48.928,1.6,1.25,.85],[1.978,48.921,.75,1,1],[1.912,48.988,1.4,1.3,.75],[1.905,49.006,.6,1.2,.8],[1.855,48.960,1.05,1.3,.75],[1.815,48.955,.75,1.1,.9],[1.712,48.986,1.25,1.3,.7],[1.712,48.970,1.15,1.15,.85],[1.745,49.003,.8,1.2,.8],[1.680,48.980,.6,1,1],[2.004,48.941,.55,1.2,.9],[2.004,48.983,.75,1.2,.8]].map((t,i)=>({c:P(t),r:t[2],poly:blob(t[0],t[1],t[2],t[3],t[4],i*1.7)}));
- const FORESTS=[blob(2.105,48.925,2.6,.9,1.3,2),blob(1.935,48.905,1.9,1.7,.65,5),blob(1.965,48.963,.8,1.2,.8,7),blob(1.765,48.940,1.4,1.5,.7,3),blob(1.840,48.933,1.1,1.2,.8,9),blob(1.66,49.03,1.4,1.4,.8,4)];
- let seed=7;const rand=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
- const STREETS=[];TOWNS.forEach(t=>{const base=rand()*Math.PI;for(let i=0;i<t.r*22;i++){const a=rand()*Math.PI*2,d=Math.sqrt(rand())*t.r*.85,x=t.c[0]+Math.cos(a)*d*1.2,y=t.c[1]+Math.sin(a)*d*.8,o=base+(rand()<.5?0:Math.PI/2)+(rand()-.5)*.25,l=.18+rand()*.45;STREETS.push([[x-Math.cos(o)*l,y-Math.sin(o)*l],[x+Math.cos(o)*l,y+Math.sin(o)*l]]);}});
- const LABELS=[['Mantes-la-Ville',1.712,48.9745,1],['Poissy',2.045,48.929,1],['Les Mureaux',1.912,48.988,2],['Mantes-la-Jolie',1.712,48.989,2],['Aubergenville',1.855,48.960,2],['Orgeval',1.978,48.921,3],['Épône',1.815,48.955,3],['Limay',1.745,49.004,3],['Meulan',1.905,49.008,3],['Triel-sur-Seine',2.004,48.984,3]].map(([n,lon,lat,r])=>({n,p:P([lon,lat]),r}));
- const SHIELD=P([1.875,48.949]);
- const ICONS={merge:'M8 20v-5.5c0-2.6 1.6-4.4 4.2-5.4L17 7.5M13.2 5.6 17 7.5l-1.9 3.8',straight:'M12 20V5M7 10l5-5 5 5',exit:'M9 20v-7.5c0-2.5 1.3-4.4 3.6-5.6L16 5M12 4.5h4.5V9',pin:'M12 21s-6-5.6-6-10.5a6 6 0 0 1 12 0C18 15.4 12 21 12 21zm0-8.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z'};
- const STOPS=[0,(JUNCTION+EXIT)/2,EXIT-.7,TOTAL];
- const state={reveal:1,blend:1,d:TOTAL};
- let travel=null,travelStarted=false,currentStop=3,drawFrame=0,arrivalTime='';
- function at(d){d=Math.max(0,Math.min(TOTAL,d));let i=1;while(i<cum.length-1&&cum[i]<d)i++;const t=(d-cum[i-1])/((cum[i]-cum[i-1])||1),a=route[i-1],b=route[i];return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];}
- function heading(d,w){const a=at(d-w),b=at(d+w);return Math.atan2(b[0]-a[0],b[1]-a[1]);}
- const angleLerp=(a,b,t)=>{let d=((b-a+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI;return a+d*t;};
- function palette(){return document.documentElement.dataset.theme==='dark'?{land:'#1b2029',town:'#222833',forest:'#1b2b26',water:'#1d3550',street:'#2b323f',main:'#363e4d',mainCase:'#2a303c',hw:'#4a5160',hwCase:'#2f3540',route:'#4c8df6',routeCase:'#2563c9',done:'#3b4a63',label:'#aab4c3',halo:'#1b2029',strong:'#e8edf4'}:{land:'#f5f4f1',town:'#ecebe7',forest:'#dbecd3',water:'#b5d3f3',street:'#ffffff',main:'#ffffff',mainCase:'#dfdcd6',hw:'#fbe3a0',hwCase:'#e7c46b',route:'#1a73e8',routeCase:'#1557b0',done:'#a8c3ec',label:'#5f6368',halo:'#f5f4f1',strong:'#202124'};}
- function camera(w,h){
-  const xs=route.map(p=>p[0]),ys=route.map(p=>p[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
-  const over={x:(minX+maxX)/2,y:(minY+maxY)/2,z:Math.min((w-110)/(maxX-minX),(h-190)/(maxY-minY)),r:0,ay:h*.6};
-  const car=at(state.d),nav={x:car[0],y:car[1],z:Math.max(42,w/8.5),r:heading(state.d+.5,1.1),ay:h*.66};
-  const t=state.blend;
-  return{x:over.x+(nav.x-over.x)*t,y:over.y+(nav.y-over.y)*t,z:Math.exp(Math.log(over.z)+(Math.log(nav.z)-Math.log(over.z))*t),r:angleLerp(over.r,nav.r,t),ax:w/2,ay:over.ay+(nav.ay-over.ay)*t};
- }
- function drawMap(){
-  if(!ctx)return;const w=root.clientWidth,h=root.clientHeight;if(!w||!h)return;
-  const ratio=Math.min(devicePixelRatio||1,2);
-  if(map.width!==Math.round(w*ratio)||map.height!==Math.round(h*ratio)){map.width=Math.round(w*ratio);map.height=Math.round(h*ratio);}
-  const C=palette(),cam=camera(w,h),z=cam.z,cos=Math.cos(-cam.r),sin=Math.sin(-cam.r);
-  const S=([x,y])=>{const dx=(x-cam.x)*z,dy=-(y-cam.y)*z;return[cam.ax+dx*cos-dy*sin,cam.ay+dx*sin+dy*cos];};
-  ctx.setTransform(ratio,0,0,ratio,0,0);ctx.fillStyle=C.land;ctx.fillRect(0,0,w,h);
-  ctx.save();ctx.translate(cam.ax,cam.ay);ctx.rotate(-cam.r);ctx.scale(z,-z);ctx.translate(-cam.x,-cam.y);ctx.lineCap='round';ctx.lineJoin='round';
-  const poly=(pts,fill)=>{ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=fill;ctx.fill();};
-  const path=(pts,color,px,from=0,to=pts.length)=>{if(to-from<2)return;ctx.beginPath();for(let i=from;i<to;i++)i===from?ctx.moveTo(pts[i][0],pts[i][1]):ctx.lineTo(pts[i][0],pts[i][1]);ctx.strokeStyle=color;ctx.lineWidth=px/z;ctx.stroke();};
-  FORESTS.forEach(f=>poly(f,C.forest));TOWNS.forEach(t=>poly(t.poly,C.town));
-  path(SEINE,C.water,Math.max(2.5,.17*z));
-  if(z>20){ctx.globalAlpha=Math.min(.9,(z-20)/25);STREETS.forEach(s=>path(s,C.street,Math.max(1,.028*z)));ctx.globalAlpha=1;}
-  ROADS.main.forEach(r=>path(r,C.mainCase,Math.max(2,.085*z)+1.5));ROADS.main.forEach(r=>path(r,C.main,Math.max(2,.085*z)));
-  ROADS.highway.forEach(r=>path(r,C.hwCase,Math.max(3,.12*z)+2));ROADS.highway.forEach(r=>path(r,C.hw,Math.max(3,.12*z)));
-  const rw=Math.max(4.5,.14*z),end=Math.max(2,Math.round(route.length*state.reveal));let done=1;while(done<route.length&&cum[done]<state.d)done++;
-  const car=at(state.d);
-  path(route,C.routeCase,rw+2.5,0,end);path(route,C.route,rw,0,end);
-  if(state.d>0){const seg=route.slice(0,done).concat([car]);path(seg,C.routeCase,rw+2.5);path(seg,C.done,rw);}
-  ctx.restore();
-  const boxes=[],label=(text,[x,y],{size=11,weight=500,color=C.label,dx=0,dy=0,align='center'}={})=>{ctx.font=`${weight} ${size}px Outfit,Arial,sans-serif`;const m=ctx.measureText(text).width;const lx=align==='left'?x+dx:x-m/2+dx,ly=y+dy;const b=[lx-3,ly-size,lx+m+3,ly+4];if(lx<4||lx+m>w-4||ly<size+4||ly>h-4||boxes.some(o=>b[0]<o[2]&&b[2]>o[0]&&b[1]<o[3]&&b[3]>o[1]))return false;boxes.push(b);ctx.lineWidth=3.5;ctx.strokeStyle=C.halo;ctx.lineJoin='round';ctx.strokeText(text,lx,ly);ctx.fillStyle=color;ctx.fillText(text,lx,ly);return true;};
-  // marqueurs de départ et d'arrivée
-  const start=S(route[0]),dest=S(route[route.length-1]),carS=S(car);if(state.blend>.5)boxes.push([carS[0]-26,carS[1]-26,carS[0]+26,carS[1]+26]);
-  if(state.blend<.6||state.d>.4){ctx.beginPath();ctx.arc(start[0],start[1],6,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle=C.strong;ctx.stroke();}
-  const pin=(x,y)=>{ctx.save();ctx.translate(x,y);ctx.shadowColor='#0004';ctx.shadowBlur=6;ctx.shadowOffsetY=2;ctx.beginPath();ctx.moveTo(0,0);ctx.bezierCurveTo(-3,-8,-10,-12,-10,-20);ctx.arc(0,-20,10,Math.PI,0);ctx.bezierCurveTo(10,-12,3,-8,0,0);ctx.fillStyle='#ea4335';ctx.fill();ctx.shadowColor='transparent';ctx.beginPath();ctx.arc(0,-20,3.6,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.restore();};
-  if(state.reveal>.98)pin(dest[0],dest[1]);
-  const overview=state.blend<.5;
-  if(overview){label('H3 Campus',start,{weight:600,color:C.strong,dy:-12,size:12});if(state.reveal>.98)label('Mairie',dest,{weight:600,color:C.strong,dy:-36,size:12});}
-  // bouclier autoroute
-  const sh=S(SHIELD);if(sh[0]>20&&sh[0]<w-20&&sh[1]>20&&sh[1]<h-20){ctx.font='700 10px Outfit,Arial,sans-serif';const m=ctx.measureText('A13').width+10;ctx.fillStyle='#c5221f';ctx.beginPath();ctx.roundRect(sh[0]-m/2,sh[1]-8,m,16,4);ctx.fill();ctx.fillStyle='#fff';ctx.fillText('A13',sh[0]-m/2+5,sh[1]+4);boxes.push([sh[0]-m/2,sh[1]-8,sh[0]+m/2,sh[1]+8]);}
-  LABELS.filter(l=>overview?l.r===1:l.r<=(z>45?3:2)).forEach(l=>label(l.n,S(l.p),{weight:l.r===1?600:500,size:l.r===1?12:11,color:l.r===1?C.strong:C.label,dy:overview?16:0}));
-  // véhicule
-  if(state.reveal>.98&&state.d<TOTAL-.02){const c=S(car),a=heading(state.d,.25)-cam.r;ctx.save();ctx.translate(c[0],c[1]);ctx.beginPath();ctx.arc(0,0,state.blend>.5?22:14,0,Math.PI*2);ctx.fillStyle='#1a73e81f';ctx.fill();ctx.rotate(a);ctx.shadowColor='#0005';ctx.shadowBlur=6;ctx.shadowOffsetY=1;ctx.beginPath();ctx.moveTo(0,-11);ctx.lineTo(8,9);ctx.lineTo(0,5);ctx.lineTo(-8,9);ctx.closePath();ctx.fillStyle='#fff';ctx.fill();ctx.shadowColor='transparent';ctx.beginPath();ctx.moveTo(0,-7.5);ctx.lineTo(5.2,6);ctx.lineTo(0,3.4);ctx.lineTo(-5.2,6);ctx.closePath();ctx.fillStyle=C.route;ctx.fill();ctx.restore();}
-  if(compass)compass.style.transform=`rotate(${-cam.r}rad)`;
-  updateGuidance();
- }
- const km=d=>d<1?`${Math.max(50,Math.round(d*1000/50)*50)} m`:d<10?`${d.toFixed(1).replace('.',',')} km`:`${Math.round(d)} km`;
- let lastIcon='';
- function updateGuidance(){
-  const d=state.d;let icon,dist,text;
-  if(d<JUNCTION){icon='merge';dist=km(JUNCTION-d);text='Rejoindre l’A13 direction Rouen';}
-  else if(EXIT-d>6){icon='straight';dist=km(EXIT-d);text='Continuer sur l’A13';}
-  else if(d<EXIT){icon='exit';dist=km(EXIT-d);text='Sortie Mantes-la-Ville';}
-  else if(TOTAL-d>.03){icon='pin';dist=km(TOTAL-d);text='Mairie de Mantes-la-Ville';}
-  else{icon='pin';dist='Arrivée';text='Mairie de Mantes-la-Ville';}
-  if(icon!==lastIcon){out.icon.setAttribute('d',ICONS[icon]);out.icon.setAttribute('fill',icon==='pin'?'currentColor':'none');lastIcon=icon;}
-  out.dist.textContent=dist;out.text.textContent=text;
-  const left=TOTAL-d;out.time.textContent=left<.03?'Arrivé':`${Math.max(1,Math.ceil(MINUTES*left/TOTAL))} min`;out.km.textContent=left<.03?'0 m':km(left);out.arrival.textContent=arrivalTime;
- }
- function setStop(index){currentStop=index;document.querySelectorAll('[data-stop]').forEach(b=>{const active=Number(b.dataset.stop)===index;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active);});}
- function stopAt(d){let i=0;STOPS.forEach((s,k)=>{if(d>=s-.01)i=k;});return i;}
- function showMap(on){root.classList.toggle('is-driving',on);map.style.opacity=on?'1':'0';ui.style.opacity=on?'1':'0';title.style.opacity=on?'0':'1';skip.hidden=!on;}
- function finishTravel(){if(travel){travel.kill();travel=null;}Object.assign(state,{reveal:1,blend:1,d:TOTAL});setStop(3);showMap(false);photo.style.transform='scale(1)';drawMap();}
- function stamp(){const t=new Date(Date.now()+MINUTES*60000);arrivalTime=`${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;}
- function selectStop(index){
-  if(travel){travel.kill();travel=null;}if(index===3){finishTravel();return;}
-  stamp();setStop(index);Object.assign(state,index===0?{reveal:1,blend:0,d:0}:{reveal:1,blend:1,d:STOPS[index]});showMap(true);drawMap();
- }
- function playTravel(){
-  if(!window.gsap||!animated()){finishTravel();return;}
-  if(travel)travel.kill();travelStarted=true;stamp();setStop(0);Object.assign(state,{reveal:0,blend:0,d:0});
-  gsap.set([map,ui],{opacity:0});root.classList.add('is-driving');skip.hidden=false;title.style.opacity='0';gsap.set(photo,{scale:1.06});drawMap();
-  travel=gsap.timeline({defaults:{onUpdate:drawMap},onComplete:()=>{travel=null;}});
-  travel.to(map,{opacity:1,duration:.45,ease:'power1.out'})
-   .to(state,{reveal:1,duration:1.3,ease:'power2.inOut'},.15)
-   .to(ui,{opacity:1,duration:.4},1.2)
-   .to(state,{blend:1,duration:1.2,ease:'power2.inOut'},'+=.35')
-   .to(state,{d:TOTAL,duration:6.2,ease:'power1.inOut',onUpdate(){drawMap();const s=stopAt(state.d);if(s!==currentStop)setStop(s);}},'-=.15')
-   .call(()=>setStop(3))
-   .to([map,ui],{opacity:0,duration:.8,ease:'power1.inOut'},'+=.55')
-   .call(()=>{root.classList.remove('is-driving');skip.hidden=true;})
-   .to(photo,{scale:1,duration:1.5,ease:'power2.out'},'<-.45')
-   .to(title,{opacity:1,duration:.65},'<.3');
- }
- document.querySelectorAll('[data-stop]').forEach(b=>b.addEventListener('click',()=>selectStop(Number(b.dataset.stop))));
- document.getElementById('travel-replay').addEventListener('click',playTravel);
- skip.addEventListener('click',finishTravel);
- new ResizeObserver(()=>{cancelAnimationFrame(drawFrame);drawFrame=requestAnimationFrame(drawMap);}).observe(root);
- finishTravel();
  const svg=(content)=>`<svg viewBox="0 0 440 90" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">${content}</svg>`;
  const previews={
  glpi:'<img src="GLPI%20Dashboard.png" alt="" loading="lazy"><span class="project-visual-label">SUPPORT / GLPI</span>',
@@ -140,8 +20,6 @@
  document.querySelectorAll('[data-watch]').forEach(button=>button.addEventListener('click',()=>{if(!window.gsap||!animated())return;gsap.fromTo('#watch-detail>*',{opacity:.2,x:14},{opacity:1,x:0,stagger:.04,duration:.45,ease:'power2.out',clearProps:'transform,opacity'});}));
  document.querySelectorAll('.mission').forEach(card=>{card.addEventListener('pointermove',e=>{if(!animated())return;const box=card.getBoundingClientRect();card.style.setProperty('--mx',`${e.clientX-box.left}px`);card.style.setProperty('--my',`${e.clientY-box.top}px`);});});
  window.addEventListener('portfolio:project',()=>{if(!window.gsap||!animated())return;gsap.fromTo('#project-dialog',{opacity:0,y:18,scale:.99},{opacity:1,y:0,scale:1,duration:.55,ease:'power3.out',clearProps:'transform,opacity'});gsap.fromTo('.project-detail-hero>h2,.project-detail-subtitle,.project-detail-visual',{opacity:0,y:12},{opacity:1,y:0,stagger:.025,duration:.5,delay:.1,clearProps:'transform,opacity'});});
- window.addEventListener('portfolio:page',e=>{if(e.detail.id==='entreprise'){if(!travelStarted)playTravel();else if(currentStop===3)finishTravel();}else if(travel){finishTravel();}if(e.detail.id==='competences')enrichSkill();});
- window.addEventListener('portfolio:motion',()=>{if(paused)finishTravel();});
- window.addEventListener('portfolio:theme',drawMap);
+ window.addEventListener('portfolio:page',e=>{if(e.detail.id==='competences')enrichSkill();});
 })();
 

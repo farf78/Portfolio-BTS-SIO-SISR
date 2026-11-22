@@ -1,0 +1,30 @@
+/* ==========================================================================
+   gps.css — compléments de l'interface GPS de la rubrique Entreprise :
+   consigne suivante, vitesse, changement de consigne animé.
+   ========================================================================== */
+.gps-maneuver{z-index:2;transition:background .3s}
+.gps-maneuver.is-swap{animation:gps-swap .45s cubic-bezier(.16,1,.3,1)}
+@keyframes gps-swap{from{opacity:.25;transform:translateY(-8px) scale(.98)}}
+
+/* « Puis… » sous le bandeau, comme dans les applications de navigation */
+.gps-then{position:absolute;z-index:1;top:60px;left:14px;max-width:calc(100% - 150px);padding:13px 13px 6px;margin-top:-8px;border-radius:0 0 12px 12px;
+ background:#1f2328cc;color:#ffffffc9;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .3s}
+.gps-then:empty{display:none}
+.gps-ui:not(.is-nav) .gps-then{opacity:0}
+
+/* Vitesse simulée */
+.gps-speed{position:absolute;right:56px;bottom:12px;width:42px;height:42px;border-radius:50%;background:#fffffff2;box-shadow:0 4px 16px #0000001f;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;transition:opacity .4s,transform .4s}
+.gps-speed strong{font-size:15px;font-weight:600;color:#202124;font-variant-numeric:tabular-nums}
+.gps-speed small{font-size:7.5px;letter-spacing:.04em;color:#5f6368;margin-top:2px}
+.gps-ui:not(.is-nav) .gps-speed{opacity:0;transform:scale(.8)}
+
+@media(max-width:760px){
+ .gps-then{top:102px;max-width:calc(100% - 28px)}
+ .gps-speed{width:38px;height:38px;bottom:11px}.gps-speed strong{font-size:13px}
+}
+
+[data-theme=dark] .gps-then{background:#0f1218d9}
+[data-theme=dark] .gps-speed{background:#262b34f2}
+[data-theme=dark] .gps-speed strong{color:#e8edf4}
+[data-theme=dark] .gps-speed small{color:#aab4c3}

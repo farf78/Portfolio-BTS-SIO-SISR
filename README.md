@@ -22,6 +22,15 @@ L’entrée est passable. Dix rubriques indépendantes restent accessibles par m
 ## Introduction
 Séquence de déchiffrement (`experience.js`, styles dans `intro.css`) : une clé se verrouille octet par octet, puis le nom, la formation, l’alternance et les domaines passent du texte chiffré au texte en clair pendant qu’un fond de caractères s’efface ; le cadenas s’ouvre et le portfolio apparaît. Environ 6 s, passable avec le bouton ou `Échap`, rejouable depuis le pied de page. Elle est purement décorative : aucun chiffrement réel n’est effectué. Elle se joue quel que soit le réglage d’animations du système ; seul le réglage du portfolio la raccourcit.
 
+## Itinéraire vers la mairie
+La rubrique Entreprise joue un itinéraire façon application Plans (`plans.js`, styles dans `plans.css`), dessiné en 3D avec three.js (déjà utilisé pour le globe) :
+fiche du lieu → aperçu de l’itinéraire (« Y aller ») → navigation 3D de H3 Campus (Poissy) à la mairie par l’A13 → arrivée → photo de la façade.
+- Bandeau de guidage (distance, consigne, « Puis… », voies à la sortie), carte du bas (heure d’arrivée, minutes, kilomètres), vitesse et boussole.
+- Bâtiments en relief, rues, Seine, forêts, bouclier A13, noms de villes ; la mairie est modélisée (corps, ailes, beffroi).
+- Environ 18 s. « Voir la mairie » passe directement à la photo ; « Rejouer l’itinéraire » relance ; les quatre étapes sous la carte sont cliquables.
+- Démarre après la transition de page. Avec « Réduire les animations », la photo s’affiche et chaque étape montre une image fixe. Sans WebGL, la photo s’affiche.
+- Carte illustrative : tracés simplifiés, rues et bâtiments générés ; la vitesse (50 km/h en ville, 110 sur l’A13) et la durée (27 min) sont indicatives.
+
 ## Contact
 La rubrique Contact affiche un QR code qui contient une fiche contact (vCard : nom, fonction, e-mail, profil LinkedIn). Un clic l’agrandit pour le scanner de loin. La même fiche se télécharge avec `assets/fares-aref.vcf`. Si une coordonnée change, il faut régénérer le QR code et ce fichier.
 
